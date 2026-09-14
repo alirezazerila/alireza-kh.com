@@ -4,83 +4,175 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alireza Khodayarkhani — Environmental Systems Researcher</title>
-<meta name="description" content="Alireza Khodayarkhani — environmental sensing, urban microclimate simulation, and building resilience research at SUNY ESF.">
+<meta name="description" content="Alireza Khodayarkhani — environmental sensing, urban microclimate simulation, and building resilience research at SUNY ESF, Syracuse NY.">
+<meta name="author" content="Alireza Khodayarkhani">
+<link rel="canonical" href="https://alireza-kh.com/">
+
+<!-- Social share cards -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://alireza-kh.com/">
+<meta property="og:site_name" content="Alireza Khodayarkhani">
+<meta property="og:title" content="Alireza Khodayarkhani — Environmental Systems Researcher">
+<meta property="og:description" content="I build sensors, run simulations, and study how buildings and cities breathe. Environmental sensing, urban microclimate, and building resilience research at SUNY ESF.">
+<meta property="og:image" content="https://alireza-kh.com/assets/Alireza.jpg">
+<meta property="og:image:width" content="853">
+<meta property="og:image:height" content="853">
+<meta property="og:image:alt" content="Portrait of Alireza Khodayarkhani">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Alireza Khodayarkhani — Environmental Systems Researcher">
+<meta name="twitter:description" content="Environmental sensing, urban microclimate simulation, and building resilience research at SUNY ESF.">
+<meta name="twitter:image" content="https://alireza-kh.com/assets/Alireza.jpg">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='13' fill='%2314181D'/><circle cx='32' cy='32' r='22' fill='none' stroke='%232F7A72' stroke-width='2'/><text x='32' y='42' font-family='Georgia,serif' font-size='26' fill='%23C89B4E' text-anchor='middle'>AK</text></svg>">
+<meta name="theme-color" content="#14181D">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+
+<script>
+  // Set theme + js flag before paint to avoid a flash of the wrong palette.
+  (function () {
+    var r = document.documentElement;
+    r.classList.add('js');
+    try {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') r.setAttribute('data-theme', saved);
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to content</a>
+
 <!-- ============ NAV ============ -->
-<nav class="nav">
-  <a href="#top" class="nav__mark">AK</a>
-  <div class="nav__links">
+<nav class="nav" id="nav">
+  <div class="nav__bar">
+    <a href="#top" class="nav__mark" aria-label="Alireza Khodayarkhani — home">
+      <span class="nav__mark-glyph">AK</span>
+      <span class="nav__mark-text mono">Khodayarkhani</span>
+    </a>
+
+    <div class="nav__links">
+      <a href="#research">Research</a>
+      <a href="#work">Projects</a>
+      <a href="#about">About</a>
+      <a href="#beyond">Beyond the Lab</a>
+      <a href="#contact">Contact</a>
+    </div>
+
+    <div class="nav__actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">
+        <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/>
+        </svg>
+        <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M20 14.4A8.4 8.4 0 1 1 9.6 4a6.6 6.6 0 0 0 10.4 10.4z"/>
+        </svg>
+      </button>
+
+      <button class="icon-btn nav__burger" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-panel">
+        <span class="burger" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav__panel" id="nav-panel" hidden>
     <a href="#research">Research</a>
-    <a href="#work">Work</a>
+    <a href="#work">Projects</a>
     <a href="#about">About</a>
     <a href="#beyond">Beyond the Lab</a>
     <a href="#contact">Contact</a>
   </div>
 </nav>
 
+<main id="main">
+
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
-  <div class="hero__emblem" aria-hidden="true">
-    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="emblem-svg">
-      <g id="rosette" fill="none" stroke="var(--brass)" stroke-width="1">
-        <circle cx="300" cy="300" r="280"/>
-        <circle cx="300" cy="300" r="230"/>
-        <circle cx="300" cy="300" r="150"/>
-        <circle cx="300" cy="300" r="60" stroke="var(--teal)"/>
-        <g id="spokes"></g>
-        <g id="petals" stroke="var(--teal)" opacity="0.55"></g>
-      </g>
-    </svg>
+  <div class="hero__grid">
+
+    <div class="hero__content">
+      <p class="eyebrow mono">Environmental Systems · SUNY ESF</p>
+      <h1 class="hero__name">Alireza<br>Khodayarkhani</h1>
+      <p class="hero__role">Researcher · Engineer · Builder · Artist</p>
+      <p class="hero__statement">I build sensors, run simulations, and study how buildings and
+        cities breathe — bringing a decade of mechanical &amp; CFD engineering into
+        environmental research on indoor air quality, urban microclimate, and
+        building resilience.</p>
+      <div class="hero__cta">
+        <a href="#work" class="btn btn--primary">View the work</a>
+        <a href="#contact" class="btn btn--ghost">Get in touch</a>
+      </div>
+    </div>
+
+    <figure class="portrait">
+      <div class="portrait__emblem" aria-hidden="true">
+        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="emblem-svg">
+          <g fill="none" stroke="var(--brass)" stroke-width="1">
+            <circle cx="300" cy="300" r="284"/>
+            <circle cx="300" cy="300" r="232"/>
+            <circle cx="300" cy="300" r="150"/>
+            <circle cx="300" cy="300" r="60" stroke="var(--teal)"/>
+            <g id="spokes"></g>
+            <g id="petals" stroke="var(--teal)" opacity="0.6"></g>
+          </g>
+        </svg>
+      </div>
+      <div class="portrait__frame">
+        <img src="assets/Alireza.jpg" width="853" height="853"
+             alt="Portrait of Alireza Khodayarkhani" loading="eager" decoding="async">
+      </div>
+      <figcaption class="portrait__cap mono">Baker Lab · Syracuse, NY</figcaption>
+    </figure>
+
   </div>
 
-  <div class="hero__content">
-    <p class="eyebrow mono">ENVIRONMENTAL SYSTEMS · SUNY ESF</p>
-    <h1 class="hero__name">Alireza<br>Khodayarkhani</h1>
-    <p class="hero__role">Researcher — Engineer — Builder — Artist</p>
-    <p class="hero__statement">I build sensors, run simulations, and study how buildings and
-      cities breathe — bringing a decade of mechanical &amp; CFD engineering into
-      environmental research on indoor air quality, urban microclimate, and building resilience.</p>
-    <div class="hero__cta">
-      <a href="#work" class="btn btn--primary">View the work</a>
-      <a href="#contact" class="btn btn--ghost">Get in touch</a>
-    </div>
-  </div>
-  <div class="scroll-cue mono" aria-hidden="true">SCROLL</div>
+  <ul class="hero__facts mono">
+    <li><span>Now</span> Research Assistant, Baker Lab</li>
+    <li><span>Aug 2026</span> M.S. Environmental Science, SUNY ESF</li>
+    <li><span>Prior</span> 10+ yrs mechanical design &amp; CFD</li>
+    <li><span>Based</span> Syracuse, New York</li>
+  </ul>
 </header>
 
 <!-- ============ RESEARCH FOCUS ============ -->
 <section class="section" id="research">
-  <div class="section__head">
-    <p class="eyebrow mono">FIG. 01 — FOCUS AREAS</p>
+  <div class="section__head reveal">
+    <p class="eyebrow mono">Fig. 01 — Focus areas</p>
     <h2>Research Focus</h2>
+    <p class="section__lede">Four threads that keep pulling on each other — hardware that
+      measures the environment, models that explain it, and buildings that have to survive it.</p>
   </div>
+
   <div class="focus-grid">
-    <article class="focus-card">
-      <p class="focus-card__tag mono">SENSING / IOT</p>
+    <article class="focus-card reveal">
+      <span class="focus-card__num mono">01</span>
+      <p class="focus-card__tag mono">Sensing / IoT</p>
       <h3>Environmental Sensing &amp; IoT</h3>
-      <p>Multi-sensor hardware — including a 12-sensor ESP32 air-quality box and
+      <p>Multi-sensor hardware — including a 12-sensor ESP32 air-quality box and a
          LoRaWAN PIR occupancy network — validated against real-world ground truth.</p>
     </article>
-    <article class="focus-card">
-      <p class="focus-card__tag mono">SIMULATION</p>
+    <article class="focus-card reveal">
+      <span class="focus-card__num mono">02</span>
+      <p class="focus-card__tag mono">Simulation</p>
       <h3>Urban Microclimate &amp; Air Quality</h3>
       <p>ENVI-met modeling of highway pollution dispersion and green-infrastructure
          mitigation around the SUNY ESF campus corridor.</p>
     </article>
-    <article class="focus-card">
-      <p class="focus-card__tag mono">BUILDING SCIENCE</p>
+    <article class="focus-card reveal">
+      <span class="focus-card__num mono">03</span>
+      <p class="focus-card__tag mono">Building science</p>
       <h3>Resilience &amp; Building Science</h3>
       <p>Chapter and figure contributions to <em>Green Building Illustrated</em> (3rd ed.),
          on passive survivability and indoor air quality under adverse conditions.</p>
     </article>
-    <article class="focus-card">
-      <p class="focus-card__tag mono">CFD / THERMAL</p>
+    <article class="focus-card reveal">
+      <span class="focus-card__num mono">04</span>
+      <p class="focus-card__tag mono">CFD / Thermal</p>
       <h3>Computational &amp; Thermal Systems</h3>
       <p>A decade of CFD-driven mechanical design in Ansys Fluent — from HVAC systems
          to a smart evaporative cooling platform cutting energy use by 30%.</p>
@@ -88,132 +180,174 @@
   </div>
 </section>
 
-<!-- ============ SELECT WORKS ============ -->
+<!-- ============ SELECTED WORK ============ -->
 <section class="section section--alt" id="work">
-  <div class="section__head">
-    <p class="eyebrow mono">FIG. 02 — SELECTED WORK</p>
+  <div class="section__head reveal">
+    <p class="eyebrow mono">Fig. 02 — Selected work</p>
     <h2>Projects</h2>
+    <p class="section__lede">Sensors in the field, models on the cluster, figures in print.</p>
   </div>
 
-  <div class="filters mono" role="tablist">
-    <button class="filter is-active" data-filter="all">All</button>
-    <button class="filter" data-filter="sensing">Sensing &amp; IoT</button>
-    <button class="filter" data-filter="simulation">Simulation</button>
-    <button class="filter" data-filter="publishing">Publishing</button>
+  <div class="filters mono" role="group" aria-label="Filter projects by category">
+    <button class="filter is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter" type="button" data-filter="sensing" aria-pressed="false">Sensing &amp; IoT</button>
+    <button class="filter" type="button" data-filter="simulation" aria-pressed="false">Simulation</button>
+    <button class="filter" type="button" data-filter="publishing" aria-pressed="false">Publishing</button>
   </div>
 
-  <div class="work-grid">
+  <div class="plates" id="plates">
 
-    <article class="work-card" data-cat="sensing">
-      <p class="work-card__meta mono">SENSING &amp; IOT — 2025–2026</p>
-      <h3>Home Occupancy Detection</h3>
-      <p>A LoRaWAN PIR sensor network paired with a state-machine algorithm to detect
-         home occupancy, validated against Google Maps Timeline as ground truth.</p>
-      <ul class="stat-row mono">
-        <li><strong>94.97%</strong> accuracy</li>
-        <li><strong>95.73%</strong> F1 score</li>
-        <li><strong>66</strong> days validated</li>
-      </ul>
+    <article class="plate reveal" data-cat="sensing">
+      <div class="plate__aside">
+        <span class="plate__num">01</span>
+        <p class="plate__cat mono">Sensing &amp; IoT</p>
+        <p class="plate__year mono">2025 — 2026</p>
+      </div>
+      <div class="plate__body">
+        <h3>Home Occupancy Detection</h3>
+        <p class="plate__desc">A LoRaWAN PIR sensor network paired with a state-machine
+          algorithm to detect home occupancy, validated minute-by-minute against Google
+          Maps Timeline as ground truth.</p>
+        <ul class="stat-row">
+          <li><strong>94.97%</strong><span class="mono">Accuracy</span></li>
+          <li><strong>95.73%</strong><span class="mono">F1 score</span></li>
+          <li><strong>66</strong><span class="mono">Days validated</span></li>
+        </ul>
+        <ul class="tags mono">
+          <li>LoRaWAN</li><li>PIR sensors</li><li>Python</li><li>State machine</li>
+        </ul>
+      </div>
     </article>
 
-    <article class="work-card" data-cat="sensing">
-      <p class="work-card__meta mono">SENSING &amp; IOT — 2025–2026</p>
-      <h3>AQD Environmental Sensor Box</h3>
-      <p>An ESP32-based air-quality device integrating twelve sensors — particulate
-         matter, gases, wind, light, temperature/humidity — with live Firebase logging
-         and a real-time web dashboard.</p>
-      <ul class="stat-row mono">
-        <li><strong>12</strong> sensors</li>
-        <li><strong>ESP32</strong> core</li>
-        <li><strong>Live</strong> dashboard</li>
-      </ul>
+    <article class="plate reveal" data-cat="sensing">
+      <div class="plate__aside">
+        <span class="plate__num">02</span>
+        <p class="plate__cat mono">Sensing &amp; IoT</p>
+        <p class="plate__year mono">2025 — 2026</p>
+      </div>
+      <div class="plate__body">
+        <h3>AQD Environmental Sensor Box</h3>
+        <p class="plate__desc">An ESP32-based air-quality device integrating twelve sensors —
+          particulate matter, gases, wind, light, temperature and humidity — with live
+          Firebase logging and a real-time web dashboard.</p>
+        <ul class="stat-row">
+          <li><strong>12</strong><span class="mono">Sensors</span></li>
+          <li><strong>ESP32</strong><span class="mono">Core</span></li>
+          <li><strong>Live</strong><span class="mono">Dashboard</span></li>
+        </ul>
+        <ul class="tags mono">
+          <li>ESP32</li><li>Arduino</li><li>Firebase</li><li>I²C / UART</li>
+        </ul>
+      </div>
     </article>
 
-    <article class="work-card" data-cat="simulation">
-      <p class="work-card__meta mono">SIMULATION — 2026</p>
-      <h3>I-81 Highway Air Quality Study</h3>
-      <p>ENVI-met simulation of traffic-related pollution dispersion along the I-81
-         corridor adjacent to SUNY ESF, modeling green-space removal and restoration
-         scenarios at 2m resolution.</p>
-      <ul class="stat-row mono">
-        <li><strong>50×50×16</strong> domain</li>
-        <li><strong>2m</strong> resolution</li>
-        <li><strong>ENVI-met v5</strong></li>
-      </ul>
+    <article class="plate reveal" data-cat="simulation">
+      <div class="plate__aside">
+        <span class="plate__num">03</span>
+        <p class="plate__cat mono">Simulation</p>
+        <p class="plate__year mono">2026</p>
+      </div>
+      <div class="plate__body">
+        <h3>I-81 Highway Air Quality Study</h3>
+        <p class="plate__desc">ENVI-met simulation of traffic-related pollution dispersion
+          along the I-81 corridor adjacent to SUNY ESF, modelling green-space removal and
+          restoration scenarios at two-metre resolution.</p>
+        <ul class="stat-row">
+          <li><strong>50×50×16</strong><span class="mono">Domain</span></li>
+          <li><strong>2 m</strong><span class="mono">Resolution</span></li>
+          <li><strong>v5</strong><span class="mono">ENVI-met</span></li>
+        </ul>
+        <ul class="tags mono">
+          <li>ENVI-met v5</li><li>Microclimate</li><li>Scenario analysis</li>
+        </ul>
+      </div>
     </article>
 
-    <article class="work-card" data-cat="publishing">
-      <p class="work-card__meta mono">PUBLISHING — 2026</p>
-      <h3>Green Building Illustrated, 3rd Ed.</h3>
-      <p>Contributing chapter content and technical figures with Prof. Ian Shapiro and
-         illustrator Frank Ching, covering resilience, passive survivability, and
-         shelter-in-place design.</p>
-      <ul class="stat-row mono">
-        <li><strong>86</strong> figures</li>
-        <li><strong>Ch. 16</strong> complete</li>
-        <li><strong>Wiley</strong></li>
-      </ul>
+    <article class="plate reveal" data-cat="publishing">
+      <div class="plate__aside">
+        <span class="plate__num">04</span>
+        <p class="plate__cat mono">Publishing</p>
+        <p class="plate__year mono">2026</p>
+      </div>
+      <div class="plate__body">
+        <h3>Green Building Illustrated, 3rd Ed.</h3>
+        <p class="plate__desc">Contributing chapter content and technical figures with
+          Prof. Ian Shapiro and illustrator Frank Ching, covering resilience, passive
+          survivability, and shelter-in-place design.</p>
+        <ul class="stat-row">
+          <li><strong>86</strong><span class="mono">Figures</span></li>
+          <li><strong>Ch. 16</strong><span class="mono">Complete</span></li>
+          <li><strong>Wiley</strong><span class="mono">Publisher</span></li>
+        </ul>
+        <ul class="tags mono">
+          <li>Building science</li><li>Technical illustration</li><li>Wiley</li>
+        </ul>
+      </div>
     </article>
 
   </div>
+
+  <p class="plates__empty mono" id="plates-empty" hidden>No projects in this category yet.</p>
 </section>
 
 <!-- ============ ABOUT ============ -->
 <section class="section" id="about">
-  <div class="section__head">
-    <p class="eyebrow mono">FIG. 03 — BACKGROUND</p>
+  <div class="section__head reveal">
+    <p class="eyebrow mono">Fig. 03 — Background</p>
     <h2>About</h2>
   </div>
 
-  <div class="about-bio">
-    <p>I'm a graduate Research Assistant at SUNY ESF's Baker Lab in Syracuse, NY,
-      working under Prof. Shayan Mirzabeigi, and beginning a Master's program at
-      SUNY ESF in August 2026. Before moving into environmental research, I spent
-      over a decade in mechanical design, CFD, and project management — designing
-      HVAC systems, running Ansys Fluent simulations, and managing engineering teams
-      in Tehran. That background now shapes how I approach environmental sensing
-      and building science: as systems to be measured, modeled, and improved.</p>
+  <div class="about-bio reveal">
+    <p class="about-bio__lead">I'm a graduate Research Assistant at SUNY ESF's Baker Lab in
+      Syracuse, NY, working under Prof. Shayan Mirzabeigi, and beginning a Master's program
+      at SUNY ESF in August 2026.</p>
+    <p>Before moving into environmental research, I spent over a decade in mechanical design,
+      CFD, and project management — designing HVAC systems, running Ansys Fluent simulations,
+      and managing engineering teams in Tehran. That background now shapes how I approach
+      environmental sensing and building science: as systems to be measured, modelled,
+      and improved.</p>
   </div>
 
   <div class="timelines">
-    <div class="timeline">
-      <h3 class="timeline__title">Experience</h3>
+    <div class="timeline reveal">
+      <h3 class="timeline__title mono">Experience</h3>
       <ol class="timeline__list">
         <li>
-          <p class="timeline__date mono">SEP 2025 — PRESENT</p>
+          <p class="timeline__date mono">Sep 2025 — Present</p>
           <p class="timeline__role">Research Assistant, Thermal &amp; Environmental Systems</p>
           <p class="timeline__org">SUNY ESF · Baker Lab</p>
         </li>
         <li>
-          <p class="timeline__date mono">AUG 2024 — AUG 2025</p>
+          <p class="timeline__date mono">Aug 2024 — Aug 2025</p>
           <p class="timeline__role">Research Assistant, Thermal &amp; Environmental Systems</p>
           <p class="timeline__org">SyracuseCoE</p>
         </li>
         <li>
-          <p class="timeline__date mono">JUL 2020 — AUG 2023</p>
+          <p class="timeline__date mono">Jul 2020 — Aug 2023</p>
           <p class="timeline__role">Company Manager</p>
           <p class="timeline__org">AIROMAX</p>
         </li>
         <li>
-          <p class="timeline__date mono">JUL 2020 — AUG 2023</p>
+          <p class="timeline__date mono">Jul 2020 — Aug 2023</p>
           <p class="timeline__role">Mechanical Designer, CFD Analyst &amp; Project Manager</p>
           <p class="timeline__org">ElectroMotoTech — led development of a Smart Evaporative
             Cooling System (30% energy reduction, 25% water savings)</p>
         </li>
         <li>
-          <p class="timeline__date mono">JUN 2009 — JUN 2020</p>
+          <p class="timeline__date mono">Jun 2009 — Jun 2020</p>
           <p class="timeline__role">Mechanical Design Engineer</p>
           <p class="timeline__org">Havayar Industrial Group</p>
         </li>
       </ol>
     </div>
 
-    <div class="timeline">
-      <h3 class="timeline__title">Education</h3>
+    <div class="timeline reveal">
+      <h3 class="timeline__title mono">Education</h3>
       <ol class="timeline__list">
         <li>
-          <p class="timeline__date mono">AUG 2026 —</p>
-          <p class="timeline__role">M.S., Environmental Science <span class="tag-incoming mono">incoming</span></p>
+          <p class="timeline__date mono">Aug 2026 —</p>
+          <p class="timeline__role">M.S., Environmental Science
+            <span class="tag-incoming mono">Incoming</span></p>
           <p class="timeline__org">SUNY College of Environmental Science &amp; Forestry</p>
         </li>
         <li>
@@ -230,8 +364,8 @@
     </div>
   </div>
 
-  <div class="tools">
-    <h3 class="timeline__title">Tools &amp; Methods</h3>
+  <div class="tools reveal">
+    <h3 class="timeline__title mono">Tools &amp; Methods</h3>
     <ul class="tools__grid mono">
       <li>Python</li><li>ENVI-met</li><li>Ansys Fluent</li><li>SolidWorks</li>
       <li>Arduino / ESP32</li><li>Firebase</li><li>LoRaWAN</li><li>AutoCAD</li>
@@ -242,40 +376,54 @@
 
 <!-- ============ BEYOND THE LAB ============ -->
 <section class="section section--alt" id="beyond">
-  <div class="section__head">
-    <p class="eyebrow mono">FIG. 04 — BEYOND THE LAB</p>
+  <div class="section__head reveal">
+    <p class="eyebrow mono">Fig. 04 — Beyond the lab</p>
     <h2>Art &amp; Life</h2>
   </div>
 
   <div class="beyond-grid">
-    <article class="beyond-card">
+    <article class="beyond-card reveal">
       <h3>Sacred Geometry, in Marker</h3>
-      <p>Outside of research, I draw detailed geometric compositions in marker on
-        black canvas — including a full reproduction of the Notre-Dame rose window.
-        The same precision that goes into a state-machine algorithm or a CFD mesh
-        shows up here as radial symmetry and pattern. I'm currently developing a
-        "Sacred Geometry" series exploring Gothic rose windows and Islamic
-        geometric tilework.</p>
+      <p>Outside of research, I draw detailed geometric compositions in marker on black
+        canvas — including a full reproduction of the Notre-Dame rose window. The same
+        precision that goes into a state-machine algorithm or a CFD mesh shows up here as
+        radial symmetry and pattern. I'm currently developing a <em>Sacred Geometry</em>
+        series exploring Gothic rose windows and Islamic geometric tilework.</p>
     </article>
-    <article class="beyond-card">
+    <article class="beyond-card reveal">
       <h3>On Two Wheels, and on the Pitch</h3>
       <p>I ride regularly and follow soccer closely — both a counterbalance to long
-        stretches at a workstation and, if I'm honest, another kind of systems
-        thinking: pacing, positioning, reading a changing field in real time.</p>
+        stretches at a workstation and, if I'm honest, another kind of systems thinking:
+        pacing, positioning, reading a changing field in real time.</p>
     </article>
   </div>
 </section>
 
+</main>
+
 <!-- ============ CONTACT ============ -->
 <footer class="footer" id="contact">
   <div class="footer__inner">
-    <p class="eyebrow mono">FIG. 05 — GET IN TOUCH</p>
+    <p class="eyebrow mono">Fig. 05 — Get in touch</p>
     <h2>Let's talk research, sensors, or the occasional rose window.</h2>
-    <div class="footer__links mono">
-      <a href="mailto:your.email@esf.edu">EMAIL</a>
-      <a href="https://www.linkedin.com/in/alireza-khodayarkhani/" target="_blank" rel="noopener">LINKEDIN</a>
-      <a href="https://github.com/alirezazerila" target="_blank" rel="noopener">GITHUB</a>
+    <p class="footer__lede">Open to research collaborations, sensing and simulation work,
+      and conversations about buildings that have to hold up.</p>
+
+    <div class="footer__links">
+      <a href="mailto:alireza.khodayarkhani@gmail.com" class="footer__link">
+        <span class="mono">Email</span>
+        <span class="footer__link-val">alireza.khodayarkhani@<wbr>gmail.com</span>
+      </a>
+      <a href="https://www.linkedin.com/in/alireza-khodayarkhani/" target="_blank" rel="noopener" class="footer__link">
+        <span class="mono">LinkedIn</span>
+        <span class="footer__link-val">/in/alireza-khodayarkhani</span>
+      </a>
+      <a href="https://github.com/alirezazerila" target="_blank" rel="noopener" class="footer__link">
+        <span class="mono">GitHub</span>
+        <span class="footer__link-val">@alirezazerila</span>
+      </a>
     </div>
+
     <p class="footer__note mono">Syracuse, NY · Baker Lab, SUNY ESF</p>
   </div>
 </footer>
