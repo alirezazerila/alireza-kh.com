@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://alireza-kh.com/</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://alireza-kh.com/assets/Alireza.jpg</image:loc>
+      <image:title>Alireza Khodayarkhani</image:title>
+      <image:caption>Portrait of Alireza Khodayarkhani, environmental systems researcher at SUNY ESF</image:caption>
+    </image:image>
+  </url>
+</urlset>

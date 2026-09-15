@@ -1,6 +1,10 @@
 // ===========================================================
-// Radial "rosette" emblem behind the portrait
+// Radial "rosette" emblem ringing the portrait
 // (echoes the sacred-geometry marker work)
+//
+// R_INNER clears the circular photo, which covers 49% of the
+// stage — a radius of ~147 in this 600-unit viewBox — so no
+// spoke or petal is drawn underneath it.
 // ===========================================================
 (function buildEmblem(){
   const spokes = document.getElementById('spokes');
@@ -8,19 +12,20 @@
   if(!spokes || !petals) return;
 
   const cx = 300, cy = 300, n = 12;
+  const R_INNER = 158, R_OUTER = 284;
   const SVG = 'http://www.w3.org/2000/svg';
 
   for(let i = 0; i < n; i++){
     const angle = (360 / n) * i;
 
     const line = document.createElementNS(SVG, 'line');
-    line.setAttribute('x1', cx); line.setAttribute('y1', cy - 60);
-    line.setAttribute('x2', cx); line.setAttribute('y2', cy - 284);
+    line.setAttribute('x1', cx); line.setAttribute('y1', cy - R_INNER);
+    line.setAttribute('x2', cx); line.setAttribute('y2', cy - R_OUTER);
     line.setAttribute('transform', `rotate(${angle} ${cx} ${cy})`);
     spokes.appendChild(line);
 
-    // Petal arc spanning the mid and outer rings
-    const r1 = 150, r2 = 232;
+    // Petal arc spanning the inner and mid rings
+    const r1 = R_INNER, r2 = 232;
     const a1   = (Math.PI / 180) * (angle - 12);
     const a2   = (Math.PI / 180) * (angle + 12);
     const aMid = (Math.PI / 180) * angle;
