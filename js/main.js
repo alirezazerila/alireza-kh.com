@@ -152,26 +152,13 @@
 })();
 
 // ===========================================================
-// Scroll reveal
+// No scroll-reveal animation here, deliberately.
+//
+// An earlier version hid every section at opacity 0 and faded it in from
+// JavaScript. Every scheduling strategy tried leaked the same failure: an
+// IntersectionObserver silently skipped elements on an instant jump, and a
+// requestAnimationFrame sweep never ran while the tab was not painting. In
+// both cases real content — whole projects — stayed invisible. Gating
+// content visibility on a cosmetic fade is not a trade worth making, so
+// the content is simply always visible.
 // ===========================================================
-(function scrollReveal(){
-  const items = document.querySelectorAll('.reveal');
-  if(!items.length) return;
-
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduced || !('IntersectionObserver' in window)){
-    items.forEach(el => el.classList.add('is-visible'));
-    return;
-  }
-
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        entry.target.classList.add('is-visible');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
-
-  items.forEach(el => io.observe(el));
-})();
