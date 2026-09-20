@@ -121,9 +121,11 @@ h3{ font-size:1.28rem; font-weight:500; line-height:1.3; }
 
 em{ color:var(--accent); font-style:italic; }
 
+/* Micro-labels were 0.71rem/400 and read as fine print. Brought up to
+   match the weight and scale the nav moved to. */
 .mono{
-  font-family:var(--mono); font-size:0.71rem;
-  letter-spacing:0.1em; text-transform:uppercase;
+  font-family:var(--mono); font-size:0.82rem; font-weight:500;
+  letter-spacing:0.08em; text-transform:uppercase;
 }
 
 :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
@@ -161,10 +163,10 @@ em{ color:var(--accent); font-style:italic; }
 }
 .logo img{ width:100%; height:100%; object-fit:contain; }
 
-.logo--tl{ width:54px; height:54px; padding:7px; border-radius:var(--r-md); }
+.logo--tl{ width:72px; height:72px; padding:9px; border-radius:var(--r-md); }
 /* Several tool logos are wide wordmarks (Ansys, Siemens, LoRaWAN), which
    become unreadable in a small square — hence the generous tile. */
-.logo--tool{ width:34px; height:34px; padding:4px; border-radius:50%; }
+.logo--tool{ width:44px; height:44px; padding:7px; border-radius:50%; }
 
 /* ===========================================================
    NAV
@@ -208,8 +210,10 @@ em{ color:var(--accent); font-style:italic; }
   background:var(--accent); transform:scaleX(0); transform-origin:left;
   transition:transform .25s;
 }
-.nav__links a:hover{ color:var(--accent); }
-.nav__links a:hover::after{ transform:scaleX(1); }
+.nav__links a:hover,
+.nav__links a.is-current{ color:var(--accent); }
+.nav__links a:hover::after,
+.nav__links a.is-current::after{ transform:scaleX(1); }
 @media (max-width:1040px){ .nav__links{ display:none; } }
 
 .nav__actions{ display:flex; align-items:center; gap:8px; }
@@ -337,7 +341,16 @@ em{ color:var(--accent); font-style:italic; }
   position:absolute; inset:0;
   opacity:.55; pointer-events:none;
 }
-.emblem-svg{ width:100%; height:100%; animation:rotate-slow 150s linear infinite; }
+/* Two rings turning against each other: the tick dial and spokes forward,
+   the petal ring in reverse. Hovering the portrait spins both up. */
+.emblem-svg{
+  position:absolute; inset:0; width:100%; height:100%;
+  transition:animation-duration .4s;
+}
+.emblem-svg--outer{ animation:rotate-slow 150s linear infinite; }
+.emblem-svg--inner{ animation:rotate-slow 95s linear infinite reverse; }
+.portrait__stage:hover .emblem-svg--outer{ animation-duration:24s; }
+.portrait__stage:hover .emblem-svg--inner{ animation-duration:15s; }
 @keyframes rotate-slow{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
 
 .portrait__photo{
@@ -346,9 +359,14 @@ em{ color:var(--accent); font-style:italic; }
   transform:translate(-50%,-50%);
   border-radius:50%;
   object-fit:cover;
-  border:2px solid var(--accent);
+  border:3px solid var(--accent);
   box-shadow:var(--shadow), 0 0 0 9px var(--bg);
   filter:saturate(.98);
+  transition:transform .45s ease, box-shadow .45s ease;
+}
+.portrait__stage:hover .portrait__photo{
+  transform:translate(-50%,-50%) scale(1.04);
+  box-shadow:var(--shadow), 0 0 0 9px var(--bg), 0 0 34px -6px var(--accent);
 }
 
 .portrait__cap{ margin-top:6px; text-align:center; color:var(--text-3); }
@@ -362,12 +380,12 @@ em{ color:var(--accent); font-style:italic; }
 }
 .hero__facts li{
   padding:20px 22px; color:var(--text-2);
-  font-size:0.74rem; letter-spacing:0.02em; text-transform:none;
+  font-size:0.92rem; letter-spacing:0.01em; text-transform:none;
   font-family:var(--sans); line-height:1.5;
 }
 .hero__facts li + li{ border-left:1px solid var(--line-soft); }
 .hero__facts span{
-  display:block; font-family:var(--mono); font-size:0.64rem;
+  display:block; font-family:var(--mono); font-size:0.74rem;
   letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px;
 }
 @media (max-width:880px){
@@ -420,7 +438,7 @@ em{ color:var(--accent); font-style:italic; }
 }
 .focus-card__tag{ color:var(--accent); display:block; margin-bottom:16px; position:relative; }
 .focus-card h3{ margin-bottom:12px; position:relative; }
-.focus-card p{ color:var(--text-2); font-size:0.96rem; position:relative; }
+.focus-card p{ color:var(--text-2); font-size:1.02rem; position:relative; }
 @media (max-width:720px){ .focus-grid{ grid-template-columns:1fr; } }
 
 /* ===========================================================
@@ -497,12 +515,12 @@ em{ color:var(--accent); font-style:italic; }
   font-family:var(--display); font-weight:700; font-size:1.5rem;
   line-height:1.1; color:var(--accent); letter-spacing:-0.02em;
 }
-.stat-row span{ color:var(--text-3); font-size:0.64rem; }
+.stat-row span{ color:var(--text-3); font-size:0.74rem; font-family:var(--mono); letter-spacing:0.06em; text-transform:uppercase; }
 
 .tags{ display:flex; gap:8px; list-style:none; flex-wrap:wrap; }
 .tags li{
   border:1px solid var(--line-soft); background:var(--bg-alt);
-  color:var(--text-3); padding:5px 13px; border-radius:var(--r-pill); font-size:0.68rem;
+  color:var(--text-2); padding:6px 14px; border-radius:var(--r-pill); font-size:0.78rem;
 }
 
 .plates__empty{ color:var(--text-3); padding-top:32px; }
@@ -536,12 +554,12 @@ em{ color:var(--accent); font-style:italic; }
   gap:clamp(38px, 6vw, 72px); margin-bottom:clamp(48px, 6vw, 72px);
 }
 .timeline__title{
-  color:var(--accent); margin-bottom:24px; font-size:0.72rem;
+  color:var(--accent); margin-bottom:24px; font-size:0.84rem;
   padding-bottom:12px; border-bottom:1px solid var(--line);
 }
 .timeline__list{ list-style:none; }
 .timeline__list li{
-  display:grid; grid-template-columns:54px minmax(0,1fr);
+  display:grid; grid-template-columns:72px minmax(0,1fr);
   gap:18px; align-items:start;
   padding-bottom:26px;
 }
@@ -549,10 +567,10 @@ em{ color:var(--accent); font-style:italic; }
 .timeline__content{ min-width:0; padding-top:2px; }
 .timeline__date{ color:var(--text-3); display:block; margin-bottom:7px; }
 .timeline__role{ font-weight:500; margin-bottom:4px; }
-.timeline__org{ color:var(--text-2); font-size:0.92rem; }
+.timeline__org{ color:var(--text-2); font-size:0.98rem; }
 .tag-incoming{
   color:var(--on-accent); background:var(--accent); padding:3px 10px; margin-left:8px;
-  border-radius:var(--r-pill); font-size:0.58rem; vertical-align:middle; white-space:nowrap;
+  border-radius:var(--r-pill); font-size:0.68rem; vertical-align:middle; white-space:nowrap;
 }
 @media (max-width:760px){ .timelines{ grid-template-columns:1fr; } }
 
@@ -575,7 +593,7 @@ em{ color:var(--accent); font-style:italic; }
 }
 .beyond-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
 .beyond-card h3{ margin-bottom:14px; color:var(--accent); }
-.beyond-card p{ color:var(--text-2); font-size:0.98rem; }
+.beyond-card p{ color:var(--text-2); font-size:1.02rem; }
 @media (max-width:760px){ .beyond-grid{ grid-template-columns:1fr; } }
 
 /* ===========================================================
@@ -585,16 +603,20 @@ em{ color:var(--accent); font-style:italic; }
   padding:clamp(84px, 10vw, 128px) var(--pad) 56px;
   text-align:center;
 }
-.footer__inner{ max-width:720px; margin:0 auto; }
-.footer h2{ margin:18px 0 20px; }
+.footer__inner{ max-width:1000px; margin:0 auto; }
+.footer h2{ margin:18px auto 20px; max-width:22ch; }
 .footer__lede{ color:var(--text-2); max-width:48ch; margin:0 auto clamp(38px, 5vw, 54px); }
 
+/* Wider than the prose column: at 720px the email wrapped onto a second
+   line. The address needs ~250px, so the row gets its own width. */
 .footer__links{
-  display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;
-  margin-bottom:44px; text-align:left;
+  display:grid; grid-template-columns:repeat(3, auto); gap:12px;
+  justify-content:center;
+  width:min(1000px, 100%);
+  margin:0 auto 44px; text-align:left;
 }
 .footer__link{
-  background:var(--bg); padding:20px 22px;
+  background:var(--bg); padding:20px 24px;
   border:1px solid var(--line); border-radius:var(--r-lg);
   display:flex; flex-direction:column; gap:7px;
   transition:background .2s, border-color .2s, transform .2s;
@@ -602,7 +624,7 @@ em{ color:var(--accent); font-style:italic; }
 .footer__link:hover{ background:var(--bg-alt); border-color:var(--accent); transform:translateY(-2px); }
 .footer__link .mono{ color:var(--accent); }
 .footer__link-val{
-  color:var(--text-2); font-size:0.86rem;
+  color:var(--text-2); font-size:0.98rem;
   overflow-wrap:break-word; /* prefers the <wbr> in the email address */
   transition:color .2s;
 }

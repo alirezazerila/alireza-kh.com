@@ -27,7 +27,7 @@
 <meta name="twitter:image" content="https://alireza-kh.com/assets/Alireza.jpg">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='13' fill='%2314181D'/><circle cx='32' cy='32' r='22' fill='none' stroke='%2350EBEC' stroke-width='2'/><text x='32' y='42' font-family='Georgia,serif' font-size='26' fill='%2350EBEC' text-anchor='middle'>AK</text></svg>">
-<meta name="theme-color" content="#B3EBF2">
+<meta name="theme-color" content="#0B1418">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,10 +93,11 @@
   (function () {
     var r = document.documentElement;
     r.classList.add('js');
-    try {
-      var saved = localStorage.getItem('theme');
-      if (saved === 'light' || saved === 'dark') r.setAttribute('data-theme', saved);
-    } catch (e) {}
+    // Dark is the site's default. Only an explicit saved choice overrides it,
+    // so the OS preference does not pull first-time visitors into light.
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    r.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
   })();
 </script>
 </head>
@@ -172,13 +173,18 @@
     <figure class="portrait">
       <div class="portrait__stage">
         <div class="portrait__ring" aria-hidden="true">
-          <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="emblem-svg">
-            <g fill="none" stroke="var(--accent)" stroke-width="1">
+          <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="emblem-svg emblem-svg--outer">
+            <g fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round">
               <circle cx="300" cy="300" r="284"/>
               <circle cx="300" cy="300" r="232"/>
-              <circle cx="300" cy="300" r="158" stroke="var(--accent)"/>
               <g id="spokes"></g>
-              <g id="petals" stroke="var(--accent)" opacity="0.6"></g>
+              <g id="ticks" stroke-width="3"></g>
+            </g>
+          </svg>
+          <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="emblem-svg emblem-svg--inner">
+            <g fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="300" cy="300" r="158"/>
+              <g id="petals" opacity="0.75"></g>
             </g>
           </svg>
         </div>
@@ -535,8 +541,8 @@
     <h3 class="timeline__title mono">Tools &amp; Methods</h3>
     <ul class="tools__grid">
       <li>
-        <span class="logo logo--tool" style="--logo-bg:#03345b">
-          <img src="assets/logos/python.png" width="200" height="112" alt="" loading="lazy">
+        <span class="logo logo--tool" style="--logo-bg:#ffffff">
+          <img src="assets/logos/icon-python.svg" width="24" height="24" alt="" loading="lazy">
         </span>Python
       </li>
       <li>
@@ -546,7 +552,7 @@
       </li>
       <li>
         <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/ansys-fluent.png" width="501" height="340" alt="" loading="lazy">
+          <img src="assets/logos/icon-ansys.svg" width="24" height="24" alt="" loading="lazy">
         </span>Ansys Fluent
       </li>
       <li>
@@ -556,12 +562,12 @@
       </li>
       <li>
         <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/arduino-esp32.png" width="541" height="369" alt="" loading="lazy">
+          <img src="assets/logos/icon-arduino.svg" width="24" height="24" alt="" loading="lazy">
         </span>Arduino / ESP32
       </li>
       <li>
         <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/firebase.png" width="447" height="447" alt="" loading="lazy">
+          <img src="assets/logos/icon-firebase.svg" width="24" height="24" alt="" loading="lazy">
         </span>Firebase
       </li>
       <li>
@@ -571,17 +577,17 @@
       </li>
       <li>
         <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/autocad.png" width="240" height="240" alt="" loading="lazy">
+          <img src="assets/logos/icon-autocad.svg" width="24" height="24" alt="" loading="lazy">
         </span>AutoCAD
       </li>
       <li>
         <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/siemens-840d-cnc.png" width="447" height="447" alt="" loading="lazy">
+          <img src="assets/logos/icon-siemens.svg" width="24" height="24" alt="" loading="lazy">
         </span>Siemens 840D / CNC
       </li>
       <li>
-        <span class="logo logo--tool" style="--logo-bg:#1b1f23">
-          <img src="assets/logos/git.png" width="225" height="225" alt="" loading="lazy">
+        <span class="logo logo--tool" style="--logo-bg:#ffffff">
+          <img src="assets/logos/icon-git.svg" width="24" height="24" alt="" loading="lazy">
         </span>Git
       </li>
     </ul>
