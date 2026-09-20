@@ -56,7 +56,7 @@
   }
 
   function paintMeta(){
-    if(meta) meta.setAttribute('content', current() === 'dark' ? '#0E1216' : '#F7F3EB');
+    if(meta) meta.setAttribute('content', current() === 'dark' ? '#0B1418' : '#B3EBF2');
   }
 
   btn.addEventListener('click', () => {
@@ -104,7 +104,7 @@
   });
 
   // Panel is desktop-irrelevant — drop it if the viewport grows.
-  window.matchMedia('(min-width: 901px)').addEventListener('change', ev => {
+  window.matchMedia('(min-width: 1041px)').addEventListener('change', ev => {
     if(ev.matches) close();
   });
 })();
