@@ -335,7 +335,12 @@ em{ color:var(--accent); font-style:italic; }
 .portrait{ justify-self:center; width:min(420px, 84vw); }
 @media (max-width:880px){ .portrait{ width:min(360px, 82vw); } }
 
-.portrait__stage{ position:relative; aspect-ratio:1/1; }
+/* A rotating square's bounding box is up to 1.41x its width, which pushed
+   ~25px of real sideways scroll at narrow widths (overflow-x:clip on the
+   root did not contain it). Clipping here costs nothing visually: every
+   drawn ring lies inside the inscribed circle (outermost r=284 of 300),
+   so the corners being cut are empty. */
+.portrait__stage{ position:relative; aspect-ratio:1/1; overflow:hidden; }
 
 .portrait__ring{
   position:absolute; inset:0;
@@ -594,6 +599,32 @@ em{ color:var(--accent); font-style:italic; }
 .beyond-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
 .beyond-card h3{ margin-bottom:14px; color:var(--accent); }
 .beyond-card p{ color:var(--text-2); font-size:1.02rem; }
+
+/* Two shots per card, in a shared 3:4 slot so both cards line up. All four
+   source images are portrait at ratios 0.735–0.835, so 3:4 costs almost
+   nothing. */
+/* auto-fit rather than a fixed pair: in a narrow card two 3:4 slots side by
+   side shrank to ~119px wide, so below ~330px of card they stack one-up. */
+.beyond-media{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(165px, 1fr));
+  gap:12px; margin-top:26px;
+}
+.beyond-media figure{ min-width:0; }
+.shot-frame{
+  overflow:hidden; border:1px solid var(--line);
+  border-radius:var(--r-md); line-height:0;
+}
+.shot{
+  width:100%; height:auto; aspect-ratio:3/4;
+  transition:transform .45s ease;
+}
+/* Photographs can crop; the artwork must not, so it is contained on a
+   near-black ground that matches the black paper it is drawn on. */
+.shot--photo{ object-fit:cover; }
+.shot--art{ object-fit:contain; background:#0B0B0D; }
+.shot-frame:hover .shot{ transform:scale(1.045); }
+.beyond-media figcaption{ margin-top:9px; color:var(--text-3); line-height:1.45; }
+
 @media (max-width:760px){ .beyond-grid{ grid-template-columns:1fr; } }
 
 /* ===========================================================
