@@ -1,4 +1,149 @@
 // ===========================================================
+// Particle field — drifting nodes linked by lines, behind the page
+//
+// Native canvas rather than particles.js: no third-party request, and
+// it can be told about the theme. Density scales with viewport area so
+// a phone is not asked to animate a desktop's worth of nodes, the loop
+// stops while the tab is hidden, and reduced-motion gets one static
+// frame instead of movement.
+// ===========================================================
+(function particleField(){
+  const canvas = document.getElementById('particles');
+  if(!canvas || !canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
+
+  const LINK_DIST   = 170;     // px at which two nodes are linked
+  const AREA_PER_PT = 11000;   // one node per this many css px²
+  const MAX_POINTS  = 130;
+  const SPEED       = 0.26;    // px per frame
+  const CURSOR_DIST = 190;     // cursor-link reach
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  let w = 0, h = 0, dpr = 1, points = [], raf = null, running = false;
+  let accent = '80,235,236', pAlpha = 0.55, lAlpha = 0.22;
+  const cursor = { x: null, y: null };
+
+  function readTheme(){
+    const cs = getComputedStyle(document.documentElement);
+    const col = cs.getPropertyValue('--accent').trim();
+    const m = col.match(/^#?([0-9a-f]{6})$/i);
+    if(m){
+      const n = parseInt(m[1], 16);
+      accent = `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
+    }
+    pAlpha = parseFloat(cs.getPropertyValue('--particle-alpha')) || 0.55;
+    lAlpha = parseFloat(cs.getPropertyValue('--link-alpha')) || 0.22;
+  }
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const target = Math.min(MAX_POINTS, Math.max(26, Math.round((w * h) / AREA_PER_PT)));
+    points = [];
+    for(let i = 0; i < target; i++){
+      const a = Math.random() * Math.PI * 2;
+      points.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: Math.cos(a) * SPEED,
+        vy: Math.sin(a) * SPEED,
+        r: 1.1 + Math.random() * 1.5
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, w, h);
+
+    for(let i = 0; i < points.length; i++){
+      const p = points[i];
+      for(let j = i + 1; j < points.length; j++){
+        const q = points[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const d = Math.hypot(dx, dy);
+        if(d < LINK_DIST){
+          ctx.strokeStyle = `rgba(${accent},${lAlpha * (1 - d / LINK_DIST)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      }
+      // link toward the cursor, the "grab" effect
+      if(cursor.x !== null){
+        const dx = p.x - cursor.x, dy = p.y - cursor.y;
+        const d = Math.hypot(dx, dy);
+        if(d < CURSOR_DIST){
+          ctx.strokeStyle = `rgba(${accent},${(lAlpha * 1.9) * (1 - d / CURSOR_DIST)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(cursor.x, cursor.y);
+          ctx.stroke();
+        }
+      }
+      ctx.fillStyle = `rgba(${accent},${pAlpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function step(){
+    for(const p of points){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < -20) p.x = w + 20; else if(p.x > w + 20) p.x = -20;
+      if(p.y < -20) p.y = h + 20; else if(p.y > h + 20) p.y = -20;
+    }
+    draw();
+    raf = requestAnimationFrame(step);
+  }
+
+  function start(){
+    if(running || reduced.matches) return;
+    running = true;
+    raf = requestAnimationFrame(step);
+  }
+  function stop(){
+    running = false;
+    if(raf !== null){ cancelAnimationFrame(raf); raf = null; }
+  }
+
+  function init(){
+    readTheme();
+    resize();
+    draw();                       // always paint one frame
+    if(!reduced.matches) start(); // then animate, unless asked not to
+  }
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { const was = running; stop(); init(); if(!was) stop(); }, 180);
+  }, { passive: true });
+
+  window.addEventListener('pointermove', e => { cursor.x = e.clientX; cursor.y = e.clientY; }, { passive: true });
+  window.addEventListener('pointerleave', () => { cursor.x = cursor.y = null; }, { passive: true });
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden) stop(); else start();
+  });
+
+  reduced.addEventListener('change', () => { stop(); init(); });
+
+  // The theme toggle repaints the palette; pick the new accent up.
+  const toggle = document.getElementById('theme-toggle');
+  if(toggle) toggle.addEventListener('click', () => setTimeout(() => { readTheme(); draw(); }, 50));
+
+  init();
+})();
+
+// ===========================================================
 // Radial "rosette" emblem ringing the portrait
 // (echoes the sacred-geometry marker work)
 //
