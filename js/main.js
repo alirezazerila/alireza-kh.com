@@ -12,11 +12,16 @@
   if(!canvas || !canvas.getContext) return;
   const ctx = canvas.getContext('2d');
 
+  // Tuned to match the reference field: grab reach 231px at 0.85 line
+  // opacity, 3 nodes added per click, and a live drift rather than a crawl.
   const LINK_DIST   = 170;     // px at which two nodes are linked
   const AREA_PER_PT = 11000;   // one node per this many css px²
-  const MAX_POINTS  = 130;
-  const SPEED       = 0.26;    // px per frame
-  const CURSOR_DIST = 190;     // cursor-link reach
+  const MAX_POINTS  = 130;     // ceiling for the generated field
+  const HARD_CAP    = 260;     // ceiling once clicks have added nodes
+  const SPEED       = 0.8;     // px per frame
+  const CURSOR_DIST = 231;     // cursor-link reach
+  const GRAB_ALPHA  = 0.85;    // cursor-link opacity at zero distance
+  const PUSH_COUNT  = 3;       // nodes added per click
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -75,21 +80,26 @@
           ctx.stroke();
         }
       }
-      // link toward the cursor, the "grab" effect
+      // link toward the cursor — the "grab" effect, and the main reason the
+      // field feels responsive, so it is bright and reaches further than
+      // the node-to-node links.
+      let near = 0;
       if(cursor.x !== null){
         const dx = p.x - cursor.x, dy = p.y - cursor.y;
         const d = Math.hypot(dx, dy);
         if(d < CURSOR_DIST){
-          ctx.strokeStyle = `rgba(${accent},${(lAlpha * 1.9) * (1 - d / CURSOR_DIST)})`;
-          ctx.lineWidth = 1;
+          near = 1 - d / CURSOR_DIST;
+          ctx.strokeStyle = `rgba(${accent},${GRAB_ALPHA * near})`;
+          ctx.lineWidth = 1.2;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y); ctx.lineTo(cursor.x, cursor.y);
           ctx.stroke();
         }
       }
-      ctx.fillStyle = `rgba(${accent},${pAlpha})`;
+      // Nodes brighten and swell slightly as the cursor nears them.
+      ctx.fillStyle = `rgba(${accent},${Math.min(1, pAlpha + near * 0.45)})`;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.r * (1 + near * 0.9), 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -129,6 +139,30 @@
 
   window.addEventListener('pointermove', e => { cursor.x = e.clientX; cursor.y = e.clientY; }, { passive: true });
   window.addEventListener('pointerleave', () => { cursor.x = cursor.y = null; }, { passive: true });
+
+  // Clicking the backdrop spawns new nodes, which immediately join the
+  // link network. Clicks on anything interactive are left alone so this
+  // never competes with a real control. Oldest spawned nodes are pruned
+  // at the cap so the field cannot grow without bound.
+  function spawn(x, y){
+    for(let i = 0; i < PUSH_COUNT; i++){
+      const a = Math.random() * Math.PI * 2;
+      points.push({
+        x: x + (Math.random() - 0.5) * 24,
+        y: y + (Math.random() - 0.5) * 24,
+        vx: Math.cos(a) * SPEED,
+        vy: Math.sin(a) * SPEED,
+        r: 1.3 + Math.random() * 1.6
+      });
+    }
+    if(points.length > HARD_CAP) points.splice(0, points.length - HARD_CAP);
+    if(!running) draw();   // keep it responsive under reduced-motion
+  }
+
+  window.addEventListener('pointerdown', e => {
+    if(e.target.closest('a, button, input, textarea, select, label, summary')) return;
+    spawn(e.clientX, e.clientY);
+  }, { passive: true });
 
   document.addEventListener('visibilitychange', () => {
     if(document.hidden) stop(); else start();
