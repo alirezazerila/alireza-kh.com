@@ -41,7 +41,6 @@
      webfont, so non-Aptos visitors fall back to Inter, which is metrically
      close enough to keep the name's proportions. */
   --display: 'Aptos', 'Aptos Display', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
   --sans:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono:  'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
 
