@@ -159,6 +159,18 @@ h3{ font-size:1.3rem; font-weight:700; line-height:1.3; letter-spacing:-0.012em;
 
 em{ color:var(--accent); font-style:normal; font-weight:600; }
 
+/* Justified prose. hyphens:auto is what keeps justification from opening
+   rivers of white space in the narrower columns. Headings, labels and
+   anything monospaced are left alone. */
+.hero__statement, .section__lede, .focus-card p, .plate__desc,
+.about-bio p, .about-bio__lead, .beyond-card p, .footer__lede,
+.timeline__org, .i81__note{
+  text-align:justify;
+  text-justify:inter-word;
+  hyphens:auto;
+  -webkit-hyphens:auto;
+}
+
 /* Micro-labels were 0.71rem/400 and read as fine print. Brought up to
    match the weight and scale the nav moved to. */
 .mono{
@@ -227,10 +239,18 @@ em{ color:var(--accent); font-style:normal; font-weight:600; }
   display:flex; align-items:center; justify-content:space-between; gap:18px;
 }
 
-.nav__mark{ display:flex; align-items:baseline; gap:10px; min-width:0; }
-.nav__mark-glyph{
-  font-family:var(--display); font-size:1.2rem; font-weight:700;
-  color:var(--accent); letter-spacing:0.02em;
+/* flex:none, or this item collapses to zero width and its contents spill
+   outside their own box (the logo has no text to give it intrinsic width). */
+.nav__mark{ display:flex; align-items:center; gap:11px; flex:none; }
+/* The mark is brushed silver, cut from its photographic ground. On the pale
+   theme that silver all but vanishes, so it is darkened there. */
+/* Explicit width, and max-width cleared: .nav__mark is a flex item with
+   min-width:0, so an auto-width image resolved its max-width:100% against a
+   zero-width parent and collapsed. 35px keeps the 166:160 source ratio. */
+.nav__logo{ width:35px; height:34px; max-width:none; flex:none; }
+:root[data-theme="light"] .nav__logo{ filter:brightness(.42) contrast(1.35); }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .nav__logo{ filter:brightness(.42) contrast(1.35); }
 }
 .nav__mark-text{ color:var(--text-3); }
 @media (max-width:620px){ .nav__mark-text{ display:none; } }
@@ -360,6 +380,24 @@ em{ color:var(--accent); font-style:normal; font-weight:600; }
 .hero__role{
   font-family:var(--display); font-weight:600; font-size:1.05rem; letter-spacing:0.01em;
   color:var(--accent); margin-bottom:22px;
+}
+
+/* One role at a time, cycling. The four are stacked in a single grid cell so
+   the box is always as wide as the longest word and nothing reflows as they
+   swap. aria-label on the wrapper gives assistive tech all four at once. */
+.roles{ display:inline-grid; vertical-align:bottom; }
+.role{
+  grid-area:1 / 1;
+  opacity:0; transform:translateY(5px);
+  transition:opacity .55s ease, transform .55s ease;
+}
+.role.is-on{ opacity:1; transform:none; }
+
+/* Without motion, show all four at once rather than hiding three of them. */
+@media (prefers-reduced-motion: reduce){
+  .roles{ display:inline; }
+  .role{ opacity:1; transform:none; }
+  .role + .role::before{ content:' · '; }
 }
 .hero__statement{
   color:var(--text-2); font-size:1.06rem; max-width:50ch; margin-bottom:34px;
@@ -636,6 +674,14 @@ em{ color:var(--accent); font-style:normal; font-weight:600; }
 }
 @media (max-width:760px){ .timelines{ grid-template-columns:1fr; } }
 
+.tool-group + .tool-group{ margin-top:22px; }
+.tool-group__label{
+  color:var(--text-3); margin-bottom:10px;
+  display:flex; align-items:center; gap:12px;
+}
+.tool-group__label::after{
+  content:''; flex:1; height:1px; background:var(--line-soft);
+}
 .tools__grid{ display:flex; flex-wrap:wrap; gap:9px; list-style:none; }
 .tools__grid li{
   display:flex; align-items:center; gap:11px;
@@ -720,3 +766,96 @@ em{ color:var(--accent); font-style:normal; font-weight:600; }
 @media (max-width:700px){ .footer__links{ grid-template-columns:1fr; } }
 
 .footer__note{ color:var(--text-3); }
+
+/* ===========================================================
+   I-81 INTERACTIVE MODEL  (temporary feature)
+   Hidden wholesale when the section carries data-enabled="false";
+   the viewer script and model data are never fetched in that case.
+=========================================================== */
+#i81[data-enabled="false"],
+.nav__links a[data-i81-link][hidden],
+.nav__panel a[data-i81-link][hidden]{ display:none !important; }
+
+.i81{ margin-top:clamp(26px, 4vw, 40px); }
+
+.i81__stage{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  background:#080c11;
+  overflow:hidden;
+  min-height:clamp(320px, 52vh, 540px);
+  display:grid;
+}
+#i81-gl{
+  display:block; width:100%;
+  height:clamp(320px, 52vh, 540px);
+  touch-action:none; cursor:crosshair;
+}
+#i81-gl[hidden]{ display:none; }
+
+/* Click-to-load: a 1 MB WebGL scene should not land on every visitor. */
+.i81__poster{
+  display:grid; place-items:center; align-content:center; gap:16px;
+  padding:clamp(28px, 5vw, 52px); text-align:center;
+}
+.i81__poster-text{ color:#aebccb; max-width:46ch; font-size:1rem; }
+.i81__weight{ color:#6f8092; }
+.i81__poster[hidden]{ display:none; }
+
+.i81__badge, .i81__probe{
+  position:absolute; top:12px;
+  color:#e8f1f8; background:rgba(8,12,17,.78);
+  border:1px solid rgba(160,190,215,.22);
+  padding:6px 10px; border-radius:4px;
+  pointer-events:none; font-size:0.72rem; letter-spacing:0.04em;
+  text-transform:none;
+}
+.i81__badge{ left:12px; }
+.i81__probe{ right:12px; min-width:170px; line-height:1.55; font-variant-numeric:tabular-nums; }
+.i81__probe b{ color:#ffb562; font-weight:600; font-size:0.95rem; }
+.i81__probe span{ color:#8fa4b5; }
+
+.i81__legend{
+  position:absolute; left:12px; bottom:12px; pointer-events:none;
+  background:rgba(8,12,17,.78); border:1px solid rgba(160,190,215,.22);
+  padding:8px 10px 7px; border-radius:4px;
+}
+.i81__bar{
+  width:180px; height:9px; border-radius:2px;
+  background:linear-gradient(90deg,#fffceb,#fed98e 30%,#fe9929 55%,#d94801 78%,#7f1e0a);
+}
+.i81__bt{ display:flex; justify-content:space-between; color:#a9bccb; margin-top:5px; font-size:0.64rem; }
+
+.i81__rail{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+  gap:16px 24px;
+  background:var(--card); backdrop-filter:blur(7px);
+  border:1px solid var(--line); border-top:0;
+  border-radius:0 0 var(--r-lg) var(--r-lg);
+  padding:16px 18px 18px;
+}
+.i81__rail[hidden]{ display:none; }
+.i81__grp{ min-width:0; }
+.i81__gl{ color:var(--text-3); margin-bottom:9px; }
+.i81__chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.i81 button{
+  font-family:var(--mono); font-size:0.72rem; letter-spacing:0.04em;
+  color:var(--text-2); background:var(--band);
+  border:1px solid var(--line); border-radius:var(--r-pill);
+  padding:6px 13px; cursor:pointer; transition:color .2s, border-color .2s, background .2s;
+}
+.i81 button:hover{ color:var(--accent); border-color:var(--accent); }
+.i81 button[aria-pressed="true"]{
+  background:var(--accent); border-color:var(--accent);
+  color:var(--on-accent); font-weight:600;
+}
+.i81 .btn{ font-family:var(--sans); }
+.i81__scrub{ display:flex; align-items:center; gap:10px; }
+.i81__scrub input[type=range]{ flex:1; min-width:0; accent-color:var(--accent); }
+.i81__tnow{ min-width:48px; font-variant-numeric:tabular-nums; color:var(--text); }
+
+.i81__note{
+  color:var(--text-3); font-size:0.92rem; margin-top:22px; max-width:76ch;
+}
+.i81__fail{ padding:28px; color:#b9cbd9; font-family:var(--mono); font-size:0.8rem; text-align:center; }

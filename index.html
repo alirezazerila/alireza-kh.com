@@ -122,13 +122,14 @@ gtag('config', 'G-BL90J3F2NY');
 <nav class="nav" id="nav">
   <div class="nav__bar">
     <a href="#top" class="nav__mark" aria-label="Alireza Khodayarkhani — home">
-      <span class="nav__mark-glyph">AK</span>
+      <img class="nav__logo" src="assets/logo.png" width="166" height="160" alt="" decoding="async">
       <span class="nav__mark-text mono">Khodayarkhani</span>
     </a>
 
     <div class="nav__links">
       <a href="#research">Research</a>
       <a href="#work">Projects</a>
+      <a href="#i81" data-i81-link>I-81 Model</a>
       <a href="#about">About</a>
       <a href="#beyond">Beyond the Lab</a>
       <a href="#contact">Contact</a>
@@ -154,6 +155,7 @@ gtag('config', 'G-BL90J3F2NY');
   <div class="nav__panel" id="nav-panel" hidden>
     <a href="#research">Research</a>
     <a href="#work">Projects</a>
+    <a href="#i81" data-i81-link>I-81 Model</a>
     <a href="#about">About</a>
     <a href="#beyond">Beyond the Lab</a>
     <a href="#contact">Contact</a>
@@ -172,7 +174,11 @@ gtag('config', 'G-BL90J3F2NY');
         <span class="hero__first">Alireza</span>
         <span class="hero__last">Khodayarkhani</span>
       </h1>
-      <p class="hero__role">Researcher · Engineer · Builder · Artist</p>
+      <p class="hero__role">
+        <span class="roles" aria-label="Researcher, Engineer, Builder, Artist">
+          <span class="role is-on">Researcher</span><span class="role">Engineer</span><span class="role">Builder</span><span class="role">Artist</span>
+        </span>
+      </p>
       <p class="hero__statement">I build sensors, run simulations, and study how buildings and
         cities breathe — bringing a decade of mechanical &amp; CFD engineering into
         environmental research on indoor air quality, urban microclimate, and
@@ -205,13 +211,13 @@ gtag('config', 'G-BL90J3F2NY');
              alt="Alireza Khodayarkhani, environmental systems researcher at SUNY ESF"
              loading="eager" decoding="async">
       </div>
-      <figcaption class="portrait__cap mono">Baker Lab · Syracuse, NY</figcaption>
+      <figcaption class="portrait__cap mono">SARBELab · Syracuse, NY</figcaption>
     </figure>
 
   </div>
 
   <ul class="hero__facts mono">
-    <li><span>Now</span> Research Assistant, Baker Lab</li>
+    <li><span>Now</span> Research Assistant, SARBELab</li>
     <li><span>Aug 2026</span> M.S. Environmental Science, SUNY ESF</li>
     <li><span>Prior</span> 10+ yrs mechanical design &amp; CFD</li>
     <li><span>Based</span> Syracuse, New York</li>
@@ -428,6 +434,89 @@ gtag('config', 'G-BL90J3F2NY');
   <p class="plates__empty mono" id="plates-empty" hidden>No projects in this category yet.</p>
 </section>
 
+
+<!-- ============ I-81 INTERACTIVE MODEL ============
+     TEMPORARY FEATURE. To switch this off, set data-enabled="false" on the
+     section below and on the nav links marked data-i81-link. Nothing else
+     needs changing: the viewer code and the ~1 MB of model data are only
+     fetched once a visitor presses "Load the model", so a disabled section
+     costs nothing. To remove it for good, delete this section, the two nav
+     links, and assets/i81/.
+================================================================ -->
+<section class="section" id="i81" data-enabled="true">
+  <div class="section__head reveal">
+    <p class="eyebrow mono">Interactive · Live model</p>
+    <h2>Explore the I-81 Plume</h2>
+    <p class="section__lede">The ENVI-met run from the I-81 study, rebuilt so you can
+      turn it yourself. Traffic NO<sub>2</sub> over downtown Syracuse and the
+      I-81 / I-690 interchange on the hottest day of the reference year, at a
+      5&nbsp;m grid under a west wind of 5&nbsp;m/s.</p>
+  </div>
+
+  <ul class="hero__facts mono reveal" style="margin-top:0">
+    <li><span>Peak NO₂</span> 37.1 µg/m³ at 17:30, 0.4 m above ground</li>
+    <li><span>vs 10 m grid</span> +45% on the same ground, same hour</li>
+    <li><span>Buildings</span> 18,980 cells, tallest 54.4 m</li>
+    <li><span>Sources</span> 22,465 emitting cells, 3 traffic tiers</li>
+  </ul>
+
+  <div class="i81 reveal">
+    <div class="i81__stage" id="i81-stage">
+      <canvas id="i81-gl" hidden></canvas>
+
+      <div class="i81__poster" id="i81-poster">
+        <p class="i81__poster-text">A 3D model of the plume — orbit it, scrub through
+          the afternoon, and hover the ground to read a concentration.</p>
+        <button class="btn btn--primary" type="button" id="i81-load">
+          Load the model <span class="btn__arrow" aria-hidden="true">&#8594;</span>
+        </button>
+        <p class="i81__weight mono">≈1 MB of model data · WebGL</p>
+      </div>
+
+      <div class="i81__badge mono" id="i81-badge" hidden>NO<sub>2</sub> · 0.4 m · 16:00</div>
+      <div class="i81__probe mono" id="i81-probe" hidden><span>hover the ground</span></div>
+      <div class="i81__legend" id="i81-legend" hidden>
+        <div class="i81__bar"></div>
+        <div class="i81__bt mono"><span id="i81-lo">12.7</span><span id="i81-hi">29.8 µg/m³</span></div>
+      </div>
+    </div>
+
+    <div class="i81__rail" id="i81-rail" hidden>
+      <div class="i81__grp">
+        <p class="i81__gl mono">Pollutant</p>
+        <div class="i81__chips" id="i81-spc"></div>
+      </div>
+      <div class="i81__grp">
+        <p class="i81__gl mono">Height above ground</p>
+        <div class="i81__chips" id="i81-lvl"></div>
+      </div>
+      <div class="i81__grp">
+        <p class="i81__gl mono">Model time</p>
+        <div class="i81__scrub">
+          <button type="button" id="i81-play" aria-pressed="false">▶ Play</button>
+          <input type="range" id="i81-time" min="0" max="6" step="1" value="2" aria-label="Model time">
+          <span class="i81__tnow mono" id="i81-tnow">16:00</span>
+        </div>
+      </div>
+      <div class="i81__grp">
+        <p class="i81__gl mono">Layers</p>
+        <div class="i81__chips">
+          <button type="button" id="i81-tB" aria-pressed="true">Buildings</button>
+          <button type="button" id="i81-tS" aria-pressed="false">Sources</button>
+          <button type="button" id="i81-tP" aria-pressed="false">Slice plane</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="i81__note reveal">ENVI-met V6.0.0, 260 × 280 × 38 cells at 5 m over
+    1300 × 1400 m, 8 June 2018, 12:00–18:00 with the first three hours discarded as
+    spin-up. Building heights are exaggerated 2.5× so the massing reads at this zoom;
+    everything else is to scale. Grey cells are solid building interior and carry no
+    concentration. PM<sub>2.5</sub> is almost flat by construction — the modelled
+    traffic contribution is 0.13 µg/m³ — and is selectable so the absence is visible
+    rather than hidden.</p>
+</section>
 <!-- ============ ABOUT ============ -->
 <section class="section" id="about">
   <div class="section__head reveal">
@@ -436,7 +525,7 @@ gtag('config', 'G-BL90J3F2NY');
   </div>
 
   <div class="about-bio reveal">
-    <p class="about-bio__lead">I'm a graduate Research Assistant at SUNY ESF's Baker Lab in
+    <p class="about-bio__lead">I'm a graduate Research Assistant at SUNY ESF's SARBELab in
       Syracuse, NY, working under Prof. Shayan Mirzabeigi, and beginning a Master's program
       at SUNY ESF in August 2026.</p>
     <p>Before moving into environmental research, I spent over a decade in mechanical design,
@@ -451,14 +540,14 @@ gtag('config', 'G-BL90J3F2NY');
       <h3 class="timeline__title mono">Experience</h3>
       <ol class="timeline__list">
         <li>
-          <span class="logo logo--tl" style="--logo-bg:#fbfcfc">
-            <img src="assets/logos/suny-esf-baker-lab.png" width="200" height="79"
-                 alt="SUNY ESF Baker Lab logo" loading="lazy">
+          <span class="logo logo--tl" style="--logo-bg:#ffffff">
+            <img src="assets/logos/sarbel.png" width="200" height="70"
+                 alt="SARBEL — Sustainable &amp; Resilient Built Environment Lab logo" loading="lazy">
           </span>
           <div class="timeline__content">
             <p class="timeline__date mono">Sep 2025 — Present</p>
             <p class="timeline__role">Research Assistant, Thermal &amp; Environmental Systems</p>
-            <p class="timeline__org">SUNY ESF · Baker Lab</p>
+            <p class="timeline__org">SUNY ESF · <a href="https://sarbel.org" target="_blank" rel="noopener">SARBELab</a></p>
           </div>
         </li>
         <li>
@@ -491,8 +580,7 @@ gtag('config', 'G-BL90J3F2NY');
           <div class="timeline__content">
             <p class="timeline__date mono">Jul 2020 — Aug 2023</p>
             <p class="timeline__role">Mechanical Designer, CFD Analyst &amp; Project Manager</p>
-            <p class="timeline__org">ElectroMotoTech — led development of a Smart Evaporative
-              Cooling System (30% energy reduction, 25% water savings)</p>
+            <p class="timeline__org">ElectroMotoTech</p>
           </div>
         </li>
         <li>
@@ -552,58 +640,80 @@ gtag('config', 'G-BL90J3F2NY');
 
   <div class="tools reveal">
     <h3 class="timeline__title mono">Tools &amp; Methods</h3>
-    <ul class="tools__grid">
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-python.svg" width="24" height="24" alt="" loading="lazy">
-        </span>Python
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#030708">
-          <img src="assets/logos/envi-met.jpg" width="200" height="200" alt="" loading="lazy">
-        </span>ENVI-met
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-ansys.svg" width="24" height="24" alt="" loading="lazy">
-        </span>Ansys Fluent
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/solidworks.jpg" width="200" height="169" alt="" loading="lazy">
-        </span>SolidWorks
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-arduino.svg" width="24" height="24" alt="" loading="lazy">
-        </span>Arduino / ESP32
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-firebase.svg" width="24" height="24" alt="" loading="lazy">
-        </span>Firebase
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ececec">
-          <img src="assets/logos/lorawan.png" width="200" height="112" alt="" loading="lazy">
-        </span>LoRaWAN
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-autocad.svg" width="24" height="24" alt="" loading="lazy">
-        </span>AutoCAD
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-siemens.svg" width="24" height="24" alt="" loading="lazy">
-        </span>Siemens 840D / CNC
-      </li>
-      <li>
-        <span class="logo logo--tool" style="--logo-bg:#ffffff">
-          <img src="assets/logos/icon-git.svg" width="24" height="24" alt="" loading="lazy">
-        </span>Git
-      </li>
-    </ul>
+
+    <div class="tool-group">
+      <p class="tool-group__label mono">Programming &amp; Data</p>
+      <ul class="tools__grid">
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-python.svg" width="24" height="24" alt="" loading="lazy">
+          </span>Python
+        </li>
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-git.svg" width="24" height="24" alt="" loading="lazy">
+          </span>Git
+        </li>
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-firebase.svg" width="24" height="24" alt="" loading="lazy">
+          </span>Firebase
+        </li>
+      </ul>
+    </div>
+
+    <div class="tool-group">
+      <p class="tool-group__label mono">Simulation &amp; Modelling</p>
+      <ul class="tools__grid">
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#030708">
+            <img src="assets/logos/envi-met.jpg" width="200" height="200" alt="" loading="lazy">
+          </span>ENVI-met
+        </li>
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-ansys.svg" width="24" height="24" alt="" loading="lazy">
+          </span>Ansys Fluent
+        </li>
+      </ul>
+    </div>
+
+    <div class="tool-group">
+      <p class="tool-group__label mono">Mechanical &amp; CAD</p>
+      <ul class="tools__grid">
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/solidworks.jpg" width="200" height="169" alt="" loading="lazy">
+          </span>SolidWorks
+        </li>
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-autocad.svg" width="24" height="24" alt="" loading="lazy">
+          </span>AutoCAD
+        </li>
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-siemens.svg" width="24" height="24" alt="" loading="lazy">
+          </span>Siemens 840D / CNC
+        </li>
+      </ul>
+    </div>
+
+    <div class="tool-group">
+      <p class="tool-group__label mono">Electronics &amp; IoT</p>
+      <ul class="tools__grid">
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ffffff">
+            <img src="assets/logos/icon-arduino.svg" width="24" height="24" alt="" loading="lazy">
+          </span>Arduino / ESP32
+        </li>
+        <li>
+          <span class="logo logo--tool" style="--logo-bg:#ececec">
+            <img src="assets/logos/lorawan.png" width="200" height="112" alt="" loading="lazy">
+          </span>LoRaWAN
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -696,7 +806,7 @@ gtag('config', 'G-BL90J3F2NY');
       </a>
     </div>
 
-    <p class="footer__note mono">Alireza Khodayarkhani · Syracuse, NY · Baker Lab, SUNY ESF</p>
+    <p class="footer__note mono">Alireza Khodayarkhani · Syracuse, NY · SARBELab, SUNY ESF</p>
   </div>
 </footer>
 

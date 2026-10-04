@@ -441,3 +441,392 @@
 // content visibility on a cosmetic fade is not a trade worth making, so
 // the content is simply always visible.
 // ===========================================================
+
+// ===========================================================
+// Role rotator — one of the four shows at a time
+//
+// All four stay in the DOM and the wrapper carries an aria-label listing
+// them, so assistive tech and search engines see the whole set; only the
+// visual presentation cycles. Pauses while the tab is hidden.
+// ===========================================================
+(function roleRotator(){
+  const roles = [].slice.call(document.querySelectorAll('.roles .role'));
+  if(roles.length < 2) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const PERIOD = 4000;
+  let i = 0, timer = null;
+
+  function show(n){
+    roles[i].classList.remove('is-on');
+    i = n;
+    roles[i].classList.add('is-on');
+  }
+  function start(){ if(timer === null) timer = setInterval(function(){ show((i + 1) % roles.length); }, PERIOD); }
+  function stop(){ if(timer !== null){ clearInterval(timer); timer = null; } }
+
+  document.addEventListener('visibilitychange', function(){ document.hidden ? stop() : start(); });
+  start();
+})();
+
+// ===========================================================
+// I-81 model — ported from the ENVI-met study artifact
+//
+// Temporary feature. Inert unless the section says data-enabled="true",
+// and even then three.js and the ~1 MB of textures are only fetched when
+// the visitor presses Load. See the comment above the section in
+// index.html for how to switch it off.
+// ===========================================================
+(function i81(){
+  const section = document.getElementById('i81');
+  const navLinks = [].slice.call(document.querySelectorAll('[data-i81-link]'));
+
+  if(!section || section.dataset.enabled !== 'true'){
+    navLinks.forEach(function(a){ a.hidden = true; });
+    return;
+  }
+
+  const THREE_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  const ORBIT_SRC = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
+  const BASE = 'assets/i81/';
+
+  const poster  = document.getElementById('i81-poster');
+  const loadBtn = document.getElementById('i81-load');
+  const cv      = document.getElementById('i81-gl');
+  const stage   = document.getElementById('i81-stage');
+
+  function script(src){
+    return new Promise(function(res, rej){
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = res;
+      s.onerror = function(){ rej(new Error('could not load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  loadBtn.addEventListener('click', function(){
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Loading…';
+    script(THREE_SRC)
+      .then(function(){ return script(ORBIT_SRC); })
+      .then(function(){
+        if(!window.THREE) throw new Error('three.js unavailable');
+        return fetch(BASE + 'meta.json').then(function(r){
+          if(!r.ok) throw new Error('meta.json ' + r.status);
+          return r.json();
+        });
+      })
+      .then(function(meta){
+        poster.hidden = true;
+        ['i81-gl','i81-badge','i81-probe','i81-legend','i81-rail'].forEach(function(id){
+          const el = document.getElementById(id); if(el) el.hidden = false;
+        });
+        boot(meta);
+      })
+      .catch(function(e){
+        stage.innerHTML = '<div class="i81__fail">The 3D model could not load (' +
+          e.message + '). The I-81 project above describes the same run.</div>';
+      });
+  }, { once: true });
+
+  function boot(META){
+    const THREE = window.THREE;
+    const NX = META.nx, NY = META.ny, NT = META.times.length, NL = META.levels.length;
+    const SPEC = ['NO2','NOx','PM25'];
+    const SPLAB = { NO2:'NO<sub>2</sub>', NOx:'NO<sub>x</sub>', PM25:'PM<sub>2.5</sub>' };
+    const times = META.times, levels = META.levels;
+    const ranges = {};
+    SPEC.forEach(function(s){ if(META.species[s]) ranges[s] = META.species[s].range; });
+
+    let sp = 'NO2', li = 0, ti = 2, playing = false, lastT = 0, sliceOn = false;
+    const atlas = {}, atlasData = {};
+
+    const VX = 2.5, U = 0.1;
+    const Wd = NX * 5 * U, Hd = NY * 5 * U;
+
+    const ren = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+    ren.setClearColor(0x000000, 0);
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(42, 1, 1, 4000);
+    cam.position.set(Wd * 0.56, Hd * 0.50, Hd * 0.74);
+    const ctl = new THREE.OrbitControls(cam, ren.domElement);
+    ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.maxPolarAngle = Math.PI * 0.49;
+    ctl.minDistance = 28; ctl.maxDistance = 420; ctl.target.set(0, 4, 0);
+
+    scene.add(new THREE.HemisphereLight(0xcfe2f2, 0x2a3440, 0.95));
+    const dir = new THREE.DirectionalLight(0xffe9cf, 0.85);
+    dir.position.set(-60, 90, 40);
+    scene.add(dir);
+
+    function rampTex(){
+      const c = document.createElement('canvas'); c.width = 256; c.height = 1;
+      const x = c.getContext('2d');
+      const g = x.createLinearGradient(0, 0, 256, 0);
+      g.addColorStop(0, '#fffceb'); g.addColorStop(0.30, '#fed98e');
+      g.addColorStop(0.55, '#fe9929'); g.addColorStop(0.78, '#d94801');
+      g.addColorStop(1, '#7f1e0a');
+      x.fillStyle = g; x.fillRect(0, 0, 256, 1);
+      const t = new THREE.CanvasTexture(c);
+      t.minFilter = t.magFilter = THREE.LinearFilter;
+      t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+      t.generateMipmaps = false;
+      return t;
+    }
+    const RAMP = rampTex();
+
+    const VS = 'varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}';
+    const FS = [
+      'uniform sampler2D uA; uniform sampler2D uR; uniform vec2 uOff; uniform vec2 uSc;',
+      'uniform float uAl; varying vec2 vUv;',
+      'void main(){',
+      ' vec2 uv=uOff+clamp(vUv,0.0015,0.9985)*uSc;',
+      ' float q=texture2D(uA,uv).r;',
+      ' if(q<0.002) discard;',
+      ' float t=clamp((q*255.0-1.0)/254.0,0.0,1.0);',
+      ' gl_FragColor=vec4(texture2D(uR,vec2(t,0.5)).rgb,uAl);',
+      '}'
+    ].join('\n');
+
+    function concMat(alpha){
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          uA: { value: null }, uR: { value: RAMP },
+          uOff: { value: new THREE.Vector2() },
+          uSc: { value: new THREE.Vector2(1 / NT, 1 / NL) },
+          uAl: { value: alpha }
+        },
+        vertexShader: VS, fragmentShader: FS,
+        transparent: alpha < 1, depthWrite: alpha >= 1,
+        side: THREE.DoubleSide
+      });
+    }
+    const groundMat = concMat(1.0), sliceMat = concMat(0.42);
+
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(Wd, Hd), groundMat);
+    ground.rotation.x = -Math.PI / 2; ground.position.y = 0.05;
+    scene.add(ground);
+
+    const slice = new THREE.Mesh(new THREE.PlaneGeometry(Wd, Hd), sliceMat);
+    slice.rotation.x = -Math.PI / 2; slice.visible = false;
+    scene.add(slice);
+
+    const base = new THREE.Mesh(new THREE.BoxGeometry(Wd, 1.2, Hd),
+      new THREE.MeshBasicMaterial({ color: 0x121a22 }));
+    base.position.y = -0.65;
+    scene.add(base);
+
+    let srcMesh = null, bldMesh = null;
+
+    function loadTex(name, cb){
+      const im = new Image();
+      im.onload = function(){
+        const c = document.createElement('canvas');
+        c.width = im.width; c.height = im.height;
+        const g = c.getContext('2d');
+        g.drawImage(im, 0, 0);
+        const t = new THREE.CanvasTexture(c);
+        t.minFilter = t.magFilter = THREE.NearestFilter;
+        t.generateMipmaps = false;
+        t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+        let data = null;
+        try { data = g.getImageData(0, 0, im.width, im.height); } catch(e) {}
+        cb(t, data, im.width, im.height);
+      };
+      im.onerror = function(){ cb(null, null, 0, 0); };
+      im.src = name;
+    }
+
+    function buildBuildings(data, w, h){
+      const HM = META.buildingMaxHeight, hgt = [];
+      let n = 0;
+      for(let j = 0; j < h; j++){
+        for(let i = 0; i < w; i++){
+          const v = data.data[(j * w + i) * 4] / 255 * HM;
+          hgt.push(v);
+          if(v > 0.2) n++;
+        }
+      }
+      if(!n) return;
+      const mesh = new THREE.InstancedMesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshLambertMaterial({ color: 0x8d9aa6 }), n);
+      const m = new THREE.Matrix4();
+      let k = 0;
+      const cw = 5 * U;
+      for(let j = 0; j < h; j++){
+        for(let i = 0; i < w; i++){
+          const v = hgt[j * w + i];
+          if(v <= 0.2) continue;
+          const hh = v * U * VX;
+          m.makeScale(cw * 0.98, hh, cw * 0.98);
+          m.setPosition(-Wd / 2 + (i + 0.5) * cw, hh / 2, -Hd / 2 + (j + 0.5) * cw);
+          mesh.setMatrixAt(k++, m);
+        }
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      bldMesh = mesh;
+      scene.add(mesh);
+    }
+
+    function buildSources(tex){
+      srcMesh = new THREE.Mesh(new THREE.PlaneGeometry(Wd, Hd),
+        new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.85,
+          alphaTest: 0.02, side: THREE.DoubleSide }));
+      srcMesh.rotation.x = -Math.PI / 2;
+      srcMesh.position.y = 0.5;
+      srcMesh.visible = false;
+      scene.add(srcMesh);
+    }
+
+    const badge  = document.getElementById('i81-badge');
+    const tnow   = document.getElementById('i81-tnow');
+    const slider = document.getElementById('i81-time');
+
+    function setTile(){
+      const ox = ti / NT, oy = 1 - (li + 1) / NL;
+      groundMat.uniforms.uOff.value.set(ox, oy);
+      sliceMat.uniforms.uOff.value.set(ox, oy);
+      groundMat.uniforms.uA.value = atlas[sp] || null;
+      sliceMat.uniforms.uA.value = atlas[sp] || null;
+      const z = levels[li] ? levels[li].z : 0.4;
+      slice.position.y = z * U * VX;
+      slice.visible = sliceOn && li > 0;
+      const pb = document.getElementById('i81-tP');
+      pb.disabled = (li === 0);
+      pb.title = li === 0 ? 'Pick a height above 0.4 m' : '';
+      pb.style.opacity = li === 0 ? '0.45' : '1';
+      badge.innerHTML = SPLAB[sp] + ' · ' + z.toFixed(1) + ' m · ' + (times[ti] || '');
+      tnow.textContent = times[ti] || '';
+      const r = ranges[sp] || [0, 1];
+      document.getElementById('i81-lo').textContent = r[0].toFixed(1);
+      document.getElementById('i81-hi').innerHTML = r[1].toFixed(1) + ' µg/m³';
+    }
+
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    const probe = document.getElementById('i81-probe');
+
+    cv.addEventListener('mousemove', function(ev){
+      const r = cv.getBoundingClientRect();
+      ndc.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
+      ndc.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+      ray.setFromCamera(ndc, cam);
+      const hit = ray.intersectObject(ground, false);
+      if(!hit.length || !atlasData[sp]){ probe.innerHTML = '<span>hover the ground</span>'; return; }
+      const p = hit[0].point;
+      const i = Math.floor((p.x + Wd / 2) / (5 * U));
+      const j = Math.floor((p.z + Hd / 2) / (5 * U));
+      if(i < 0 || j < 0 || i >= NX || j >= NY){ probe.innerHTML = '<span>hover the ground</span>'; return; }
+      const d = atlasData[sp], W = d.width;
+      const q = d.data[((li * NY + j) * W + (ti * NX + i)) * 4];
+      const r2 = ranges[sp] || [0, 1];
+      if(q === 0){
+        probe.innerHTML = '<b>building</b><br><span>no concentration</span>';
+      } else {
+        const val = r2[0] + ((q - 1) / 254) * (r2[1] - r2[0]);
+        probe.innerHTML = '<b>' + val.toFixed(2) + '</b> µg/m³<br>' +
+          '<span>' + SPLAB[sp] + ' at ' + (levels[li] ? levels[li].z.toFixed(1) : '0.4') + ' m</span><br>' +
+          '<span>' + (META.x0 + (i + 0.5) * 5).toFixed(0) + ' E  ' +
+          (META.y0 + (NY - j - 0.5) * 5).toFixed(0) + ' N</span>';
+      }
+    });
+    cv.addEventListener('mouseleave', function(){ probe.innerHTML = '<span>hover the ground</span>'; });
+
+    function chips(host, items, get, set){
+      host.innerHTML = '';
+      items.forEach(function(label, ix){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.innerHTML = label;
+        b.setAttribute('aria-pressed', get() === ix ? 'true' : 'false');
+        b.onclick = function(){
+          set(ix);
+          Array.prototype.forEach.call(host.children, function(c, cx){
+            c.setAttribute('aria-pressed', cx === ix ? 'true' : 'false');
+          });
+          setTile();
+        };
+        host.appendChild(b);
+      });
+    }
+
+    slider.max = NT - 1;
+    slider.oninput = function(){ ti = +slider.value; setTile(); };
+
+    const playBtn = document.getElementById('i81-play');
+    playBtn.onclick = function(){
+      playing = !playing;
+      playBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      playBtn.innerHTML = playing ? '❙❙ Pause' : '▶ Play';
+    };
+
+    function toggle(id, fn){
+      const b = document.getElementById(id);
+      b.onclick = function(){
+        const on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        fn(on);
+      };
+    }
+    toggle('i81-tB', function(on){ if(bldMesh) bldMesh.visible = on; });
+    toggle('i81-tS', function(on){ if(srcMesh) srcMesh.visible = on; });
+    toggle('i81-tP', function(on){ sliceOn = on; slice.visible = on && li > 0; });
+
+    let sizedW = 0, sizedH = 0;
+    function resize(){
+      const w = cv.clientWidth, h = cv.clientHeight;
+      if(!w || !h || (w === sizedW && h === sizedH)) return;
+      sizedW = w; sizedH = h;
+      ren.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      ren.setSize(w, h, false);
+      cam.aspect = w / h;
+      cam.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize, { passive: true });
+
+    // The canvas can be laid out at zero width (a collapsed pane, a section
+    // still off-screen), which would leave the drawing buffer at its 300x150
+    // default forever. Watch the element so it corrects itself the moment it
+    // has a real size.
+    if(window.ResizeObserver){
+      new ResizeObserver(resize).observe(cv);
+    }
+
+    function tick(now){
+      requestAnimationFrame(tick);
+      if(playing && now - lastT > 780){
+        lastT = now;
+        ti = (ti + 1) % NT;
+        slider.value = ti;
+        setTile();
+      }
+      ctl.update();
+      ren.render(scene, cam);
+    }
+
+    groundMat.uniforms.uSc.value.set(1 / NT, 1 / NL);
+    sliceMat.uniforms.uSc.value.set(1 / NT, 1 / NL);
+
+    chips(document.getElementById('i81-spc'),
+      SPEC.filter(function(s){ return META.species[s]; }).map(function(s){ return SPLAB[s]; }),
+      function(){ return SPEC.indexOf(sp); },
+      function(ix){ sp = SPEC[ix]; });
+
+    chips(document.getElementById('i81-lvl'),
+      levels.map(function(l){ return l.z.toFixed(1) + ' m'; }),
+      function(){ return li; },
+      function(ix){ li = ix; });
+
+    let pending = SPEC.length + 2;
+    function done(){ if(--pending <= 0){ resize(); setTile(); requestAnimationFrame(tick); } }
+
+    SPEC.forEach(function(s){
+      loadTex(BASE + 'tex/' + s + '.png', function(t, d){
+        if(t){ atlas[s] = t; atlasData[s] = d; }
+        done();
+      });
+    });
+    loadTex(BASE + 'tex/buildings.png', function(t, d, w, h){ if(d) buildBuildings(d, w, h); done(); });
+    loadTex(BASE + 'tex/sources.png', function(t){ if(t) buildSources(t); done(); });
+  }
+})();
