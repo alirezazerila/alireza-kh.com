@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home Comfort NY — Live Sensors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:wght@500;600&display=swap">
+<style>
+:root{
+  --paper:#faf9f7; --surface:#ffffff; --sunk:#f2f0ec;
+  --line:#e3e0da; --line-strong:#cfcbc3;
+  --ink:#1c222b; --ink-2:#4a5562; --ink-3:#7c8793;
+  --bedroom:#3f5f8f; --living:#c07a3e;
+  --ok:#4f8a5b; --miss:#c24a42; --warn:#cf9233;
+  --shadow:0 1px 2px rgba(28,34,43,.06), 0 4px 14px rgba(28,34,43,.05);
+  --accent-ico:#5a6f8c; --avatar-bg:#e4e9f1; --avatar-fg:#3f5f8f;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#14181d; --surface:#1a1f26; --sunk:#222932;
+  --line:#2c333d; --line-strong:#3b434e;
+  --ink:#e8eaed; --ink-2:#b2bac4; --ink-3:#8a949f;
+  --bedroom:#7fa3d8; --living:#e0a068;
+  --ok:#6fb87d; --miss:#e0675e; --warn:#e0ae5c;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  --accent-ico:#8fa6c4; --avatar-bg:#2b3747; --avatar-fg:#9fc0e0;
+}}
+:root[data-theme="dark"]{
+  --paper:#14181d; --surface:#1a1f26; --sunk:#222932;
+  --line:#2c333d; --line-strong:#3b434e;
+  --ink:#e8eaed; --ink-2:#b2bac4; --ink-3:#8a949f;
+  --bedroom:#7fa3d8; --living:#e0a068;
+  --ok:#6fb87d; --miss:#e0675e; --warn:#e0ae5c;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  --accent-ico:#8fa6c4; --avatar-bg:#2b3747; --avatar-fg:#9fc0e0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 14px/1.5 "IBM Plex Sans",system-ui,-apple-system,sans-serif;}
+.wrap{max-width:1500px;margin:0 auto;padding-inline:20px;padding-block:0 48px}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);
+  border-bottom:1px solid var(--line);padding-block:14px 12px;margin-bottom:20px}
+.titlerow{display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;justify-content:space-between}
+h1{font:600 25px/1.15 Spectral,Georgia,serif;margin:0;letter-spacing:-.01em}
+h1 span{color:var(--ink-3);font-weight:500}
+.meta{font:400 12.5px/1.4 "IBM Plex Mono",ui-monospace,monospace;color:var(--ink-3);
+  display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+button.seg{font:500 12.5px/1 "IBM Plex Sans",sans-serif;padding:7px 11px;border-radius:7px;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);cursor:pointer}
+button.seg[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.seg:focus-visible{outline:2px solid var(--bedroom);outline-offset:2px}
+
+.layout{display:grid;grid-template-columns:258px minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:900px){ .layout{grid-template-columns:1fr} }
+
+aside{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+  box-shadow:var(--shadow);overflow:hidden}
+.aside-h{padding:12px 14px 9px;border-bottom:1px solid var(--line);
+  font:600 11px/1 "IBM Plex Sans";letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.plist{list-style:none;margin:0;padding:6px}
+.plist li{margin:0}
+.pbtn{display:block;width:100%;text-align:left;border:0;background:none;cursor:pointer;
+  padding:8px 10px;border-radius:7px;color:var(--ink);font:400 13.5px/1.35 "IBM Plex Sans"}
+.pbtn:hover{background:var(--sunk)}
+.pbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.pbtn[aria-pressed="true"] .pid,.pbtn[aria-pressed="true"] .prooms{color:rgba(255,255,255,.72)}
+.pname{display:block;font-weight:500}
+.pid{font:400 11px/1.3 "IBM Plex Mono";color:var(--ink-3)}
+.prooms{font:400 11px/1.3 "IBM Plex Mono";color:var(--ink-3)}
+.badge{display:inline-block;font:500 9.5px/1 "IBM Plex Sans";letter-spacing:.05em;
+  text-transform:uppercase;padding:3px 5px;border-radius:4px;margin-left:5px;vertical-align:1px}
+.b-share{background:rgba(63,95,143,.14);color:var(--bedroom)}
+.b-off{background:rgba(194,74,66,.15);color:var(--miss)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 13px;
+  box-shadow:var(--shadow)}
+.kpi .k{font:500 10.5px/1 "IBM Plex Sans";letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .v{font:500 25px/1.1 "IBM Plex Mono";margin-top:7px;font-variant-numeric:tabular-nums}
+.kpi .u{font-size:13px;color:var(--ink-3);margin-left:2px}
+.kpi .s{font:400 11.5px/1.3 "IBM Plex Sans";color:var(--ink-3);margin-top:3px}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+  box-shadow:var(--shadow);padding:14px 15px 10px}
+.card h2{font:600 14px/1.2 "IBM Plex Sans";margin:0 0 2px}
+.card .sub{font:400 11.5px/1.3 "IBM Plex Mono";color:var(--ink-3);margin-bottom:9px}
+.chartbox{position:relative;height:216px}
+
+.covwrap{margin-top:20px}
+.covscroll{overflow-x:auto}
+table.cov{border-collapse:collapse;font:400 11px/1 "IBM Plex Mono"}
+table.cov th.rowlab{position:sticky;left:0;background:var(--surface);text-align:left;
+  font:400 11.5px/1.25 "IBM Plex Sans";padding:3px 10px 3px 2px;white-space:nowrap;z-index:2;
+  border-right:1px solid var(--line)}
+table.cov td{padding:0 1px}
+.cell{width:9px;height:15px;border-radius:2px;display:block;background:var(--sunk)}
+.cell.on{background:var(--ok)}
+.cell.off{background:var(--miss)}
+.covlegend{display:flex;gap:16px;align-items:center;margin-top:9px;
+  font:400 11.5px/1 "IBM Plex Sans";color:var(--ink-3);flex-wrap:wrap}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.covtime{font:400 10px/1 "IBM Plex Mono";color:var(--ink-3);padding-top:4px;white-space:nowrap}
+
+.note{font:400 12px/1.5 "IBM Plex Sans";color:var(--ink-3);margin-top:7px}
+.gate{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px 20px;
+  background:rgba(12,16,20,.55)}
+.gclose{position:absolute;top:18px;right:20px;background:none;border:0;cursor:pointer;
+  color:#fff;font:400 30px/1 system-ui;opacity:.8}
+.gclose:hover{opacity:1}
+.gate[hidden]{display:none!important}
+#app[hidden]{display:none!important}
+.gatebox{width:100%;max-width:368px;background:var(--surface);border:1px solid var(--line);
+  border-radius:13px;box-shadow:var(--shadow);padding:28px 26px 22px;display:flex;flex-direction:column}
+.gtitle{font:600 23px/1.15 Spectral,Georgia,serif;margin:0;color:var(--ink)}
+.gsub{font:400 12.5px/1.4 "IBM Plex Mono";color:var(--ink-3);margin:6px 0 20px}
+.glab{font:500 11px/1 "IBM Plex Sans";letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:6px}
+.gin{font:400 14px/1 "IBM Plex Sans";padding:10px 11px;border-radius:8px;margin-bottom:15px;
+  border:1px solid var(--line-strong);background:var(--paper);color:var(--ink)}
+.gin:focus{outline:2px solid var(--bedroom);outline-offset:1px;border-color:var(--bedroom)}
+.gbtn{font:600 13.5px/1 "IBM Plex Sans";padding:11px;border-radius:8px;border:0;cursor:pointer;
+  background:var(--ink);color:var(--paper);margin-top:4px}
+.gbtn:disabled{opacity:.6;cursor:default}
+.gerr{font:400 12.5px/1.45 "IBM Plex Sans";color:var(--miss);margin:12px 0 0}
+.gerr[hidden]{display:none!important}
+.gnote{font:400 11.5px/1.5 "IBM Plex Sans";color:var(--ink-3);margin:16px 0 0;
+  padding-top:14px;border-top:1px solid var(--line)}
+.whoami{font:400 11.5px/1 "IBM Plex Mono";color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.signout{font:500 11.5px/1 "IBM Plex Sans";background:none;border:0;cursor:pointer;
+  color:var(--bedroom);text-decoration:underline;padding:0}
+.sep{width:1px;height:20px;background:var(--line-strong);margin:0 3px}
+.rangelab{font:400 11.5px/1 "IBM Plex Sans";color:var(--ink-3);display:flex;align-items:center;gap:5px}
+.rangelab input{font:400 11.5px/1 "IBM Plex Mono";padding:5px 6px;border-radius:6px;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink)}
+.card{position:relative}
+.maxbtn{position:absolute;top:11px;right:11px;border:1px solid var(--line-strong);
+  background:var(--surface);color:var(--ink-3);border-radius:6px;cursor:pointer;
+  font:500 11px/1 "IBM Plex Sans";padding:5px 8px}
+.maxbtn:hover{color:var(--ink);border-color:var(--ink-3)}
+.card.max{position:fixed;inset:14px;z-index:60;margin:0;overflow:auto;
+  box-shadow:0 18px 60px rgba(0,0,0,.35)}
+.card.max .chartbox{height:calc(100vh - 150px)}
+.scrim{position:fixed;inset:0;background:rgba(10,14,18,.55);z-index:55}
+.scrim[hidden]{display:none!important}
+.profile{margin-bottom:18px}
+.profile[hidden]{display:none!important}
+.phead{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:baseline;
+  padding-bottom:11px;margin-bottom:13px;border-bottom:1px solid var(--line)}
+.phead h2{font:600 17px/1.2 "IBM Plex Sans";margin:0}
+.phead .em{font:400 12px/1.3 "IBM Plex Mono";color:var(--ink-3)}
+.person{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.chip{font:400 11.5px/1 "IBM Plex Sans";padding:6px 9px;border-radius:999px;
+  background:var(--sunk);color:var(--ink-2);border:1px solid var(--line)}
+.chip b{font-weight:600;color:var(--ink)}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
+.hcell{background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+.hcell .hk{font:500 10px/1 "IBM Plex Sans";letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:5px;display:block}
+.hcell .hv{display:block}
+.hcell .hv{font:500 13px/1.35 "IBM Plex Sans";color:var(--ink)}
+.ico{flex:none;vertical-align:-3px}
+.hcell{display:flex;gap:10px;align-items:flex-start}
+.hcell .hico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+  background:var(--surface);border:1px solid var(--line);color:var(--accent-ico);flex:none}
+.hcell .htxt{min-width:0}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:var(--avatar-bg);color:var(--avatar-fg);
+  font:600 14px/1 "IBM Plex Sans";letter-spacing:.02em}
+.phead{align-items:center}
+.card h2{display:flex;align-items:center;gap:8px}
+.card h2 .ico{color:var(--accent-ico)}
+.kpi .k{display:flex;align-items:center;gap:6px}
+.kpi .k .ico{color:var(--ink-3)}
+.pbtn{display:flex;gap:9px;align-items:center}
+.pbtn .pav{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:var(--avatar-bg);color:var(--avatar-fg);font:600 10.5px/1 "IBM Plex Sans"}
+.pbtn[aria-pressed="true"] .pav{background:rgba(255,255,255,.2);color:#fff}
+.pbtn .ptxt{min-width:0;flex:1}
+.empty{padding:34px 16px;text-align:center;color:var(--ink-3);font-size:13px}
+@media (prefers-reduced-motion:no-preference){ .pbtn,button.seg{transition:background .12s,color .12s} }
+</style>
+</head>
+<body>
+<div class="gate" id="gate" hidden>
+  <button class="gclose" id="gClose" type="button" aria-label="Close">&times;</button>
+  <form class="gatebox" id="gateForm">
+    <h1 class="gtitle">Home Comfort NY</h1>
+    <p class="gsub">Sign in to see participant names</p>
+    <label class="glab" for="gEmail">Email</label>
+    <input class="gin" id="gEmail" type="email" autocomplete="username" required>
+    <label class="glab" for="gPass">Password</label>
+    <input class="gin" id="gPass" type="password" autocomplete="current-password" required>
+    <button class="gbtn" id="gGo" type="submit">Sign in</button>
+    <p class="gerr" id="gErr" hidden></p>
+    <p class="gnote">The sensor data on this page is public. Signing in additionally
+      reveals participant names, emails and home details, and is limited to the
+      research team.</p>
+  </form>
+</div>
+
+<div class="wrap" id="app">
+
+<header class="top">
+  <div class="titlerow">
+    <h1>Home Comfort NY <span>— live sensors</span></h1>
+    <div class="meta">
+      <span id="statusDot"><span class="dot" style="background:var(--ink-3)"></span><span id="statusTxt">connecting…</span></span>
+      <span id="updated">—</span>
+      <span class="whoami" id="whoami"></span>
+    </div>
+  </div>
+  <div class="controls">
+    <span class="meta" style="margin-right:2px">Range</span>
+    <button class="seg" data-range="6"  aria-pressed="true">6 h</button>
+    <button class="seg" data-range="24" aria-pressed="false">24 h</button>
+    <button class="seg" data-range="72" aria-pressed="false">3 days</button>
+    <button class="seg" data-range="168" aria-pressed="false">7 days</button>
+    <span class="sep"></span>
+    <label class="rangelab">from <input type="datetime-local" id="fromIn"></label>
+    <label class="rangelab">to <input type="datetime-local" id="toIn"></label>
+    <button class="seg" id="applyRange">Apply</button>
+    <span class="sep"></span>
+    <button class="seg" id="privacyBtn" aria-pressed="true" hidden>Show participant names</button>
+    <span style="flex:1"></span>
+    <button class="seg" id="refreshBtn">Refresh now</button>
+    <button class="seg" id="themeBtn">Theme</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="aside-h">Participants</div>
+    <ul class="plist" id="plist"></ul>
+  </aside>
+
+  <main>
+    <section class="card profile" id="profile" hidden></section>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2" id="charts"></div>
+
+    <section class="covwrap card">
+      <h2 id="covH2">Data collection coverage</h2>
+      <div class="sub" id="covSub">—</div>
+      <div class="covscroll"><table class="cov" id="covTable"></table></div>
+      <div class="covlegend">
+        <span><span class="sw" style="background:var(--ok)"></span>data received</span>
+        <span><span class="sw" style="background:var(--miss)"></span>nothing received</span>
+        <span><span class="sw" style="background:var(--sunk)"></span>before this device joined</span>
+      </div>
+      <p class="note" id="covNote"></p>
+    </section>
+  </main>
+</div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script src="participants.js"></script>
+<script src="icons.js"></script>
+<script>
+/* ---------- state ---------- */
+let rangeH = 6, selected = "ALL", raw = {}, charts = {}, timer = null;
+let customFrom = null, customTo = null;      /* epoch seconds, or null for preset */
+const PRIVATE = (typeof SITE_MODE !== "undefined" && SITE_MODE === "private");
+let hidePII = !PRIVATE;  /* private build shows names; public build has none to show */
+let signedIn = false;
+function winStart(){ return customFrom ?? (Math.floor(Date.now()/1000) - rangeH*3600); }
+function winEnd(){   return customTo   ?? Math.floor(Date.now()/1000); }
+function winHours(){ return (winEnd()-winStart())/3600; }
+
+const METRICS = [
+  {key:"Temperature", label:"Temperature", unit:"°C",  sub:"SHT31",  dec:1},
+  {key:"Humidity",    label:"Humidity",    unit:"%RH", sub:"SHT31",  dec:1},
+  {key:"SCD40_CO2",   label:"CO₂",         unit:"ppm", sub:"SCD40",  dec:0},
+  {key:"Lux",         label:"Light",       unit:"lx",  sub:"VEML7700", dec:1},
+];
+
+function deployed(){
+  const out=[];
+  for(const p of PARTICIPANTS){
+    if(p.bedroom!=null) out.push({dev:p.bedroom, p, room:"bedroom"});
+    if(p.living!=null)  out.push({dev:p.living,  p, room:"living room"});
+  }
+  return out;
+}
+function uniqueDevices(){ return [...new Set(deployed().map(d=>d.dev))]; }
+function dispName(p){ return hidePII ? p.id : p.name; }
+function initials(p){
+  if(hidePII) return p.id.slice(-2);
+  const parts=p.name.trim().split(/\s+/);
+  return ((parts[0]||"")[0]+((parts[parts.length-1]||"")[0]||"")).toUpperCase();
+}
+function seriesLabel(e){ return `${dispName(e.p)} (${e.room})`; }
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function fmtClock(ts){ const d=new Date(ts*1000);
+  return d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
+
+/* ---------- fetch ---------- */
+async function pull(){
+  setStatus("loading","loading…");
+  const since = winStart();
+  const until = winEnd();
+  const devs = [...uniqueDevices(), ...SPARE_DEVICES];
+  const jobs = devs.map(async d=>{
+    const tok = await Auth.token();
+    const url = `${FIREBASE}/AQD-${d}.json?orderBy=%22%24key%22&startAt=%22${since}%22&endAt=%22${until}%22`
+              + (tok ? `&auth=${encodeURIComponent(tok)}` : "");
+    try{
+      const r = await fetch(url, {cache:"no-store"});
+      if(r.status===401 || r.status===403){ throw new Error("unauthorised"); }
+      if(!r.ok) throw new Error(r.status);
+      const j = await r.json();
+      const rows = Object.entries(j||{}).map(([k,v])=>({
+        t:+k,
+        Temperature:num(v.Temperature), Humidity:num(v.Humidity),
+        SCD40_CO2:num(v.SCD40_CO2), Lux:num(v.Lux),
+      })).sort((a,b)=>a.t-b.t);
+      return [d, rows];
+    }catch(e){ return [d, null]; }
+  });
+  const res = await Promise.all(jobs);
+  raw = {}; let failed=0;
+  for(const [d,rows] of res){ if(rows===null) failed++; raw[d]=rows||[]; }
+  setStatus(failed?"warn":"ok", failed? `${failed} device(s) unreachable` : "live");
+  document.getElementById("updated").textContent =
+    "updated " + new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  render();
+}
+function num(v){ const f=parseFloat(v); return Number.isFinite(f)?f:null; }
+function setStatus(kind,txt){
+  const c = kind==="ok"?"var(--ok)":kind==="warn"?"var(--warn)":"var(--ink-3)";
+  document.getElementById("statusDot").innerHTML =
+    `<span class="dot" style="background:${c}"></span><span>${txt}</span>`;
+}
+
+/* ---------- rendering ---------- */
+function visibleEntries(){
+  const all = deployed();
+  if(selected==="ALL") return all;
+  const p = PARTICIPANTS.find(x=>x.id===selected);
+  return all.filter(e=>e.p.id===p.id);
+}
+function lastReading(dev){
+  const rows = raw[dev]||[]; return rows.length? rows[rows.length-1] : null;
+}
+function isOnline(dev){
+  const r = lastReading(dev);
+  return r ? (Date.now()/1000 - r.t) < 15*60 : false;
+}
+
+function buildParticipantList(){
+  const ul = document.getElementById("plist"); ul.innerHTML="";
+  const mk = (id,name,sub,badges)=>{
+    const li=document.createElement("li");
+    const b=document.createElement("button");
+    b.className="pbtn"; b.setAttribute("aria-pressed", String(selected===id));
+    const av = id==="ALL" ? icon("users",15) : initials(PARTICIPANTS.find(x=>x.id===id));
+    b.innerHTML = `<span class="pav">${av}</span><span class="ptxt">
+      <span class="pname">${name}${badges||""}</span>
+      <span class="pid">${id==="ALL"?"":id}</span> <span class="prooms">${sub}</span></span>`;
+    b.onclick=()=>{ selected=id; buildParticipantList(); render(); };
+    li.appendChild(b); ul.appendChild(li);
+  };
+  const onlineCount = uniqueDevices().filter(isOnline).length;
+  mk("ALL","All participants",`${uniqueDevices().length} devices · ${onlineCount} online`,"");
+  for(const p of PARTICIPANTS){
+    const rooms=[]; let offAny=false;
+    if(p.bedroom!=null){ rooms.push("bed "+p.bedroom); if(!isOnline(p.bedroom)) offAny=true; }
+    if(p.living!=null){ rooms.push("liv "+p.living);  if(!isOnline(p.living))  offAny=true; }
+    let badges="";
+    if(p.shares) badges+=`<span class="badge b-share">shared home</span>`;
+    if(offAny)   badges+=`<span class="badge b-off">offline</span>`;
+    mk(p.id,dispName(p),rooms.join(" · "),badges);
+  }
+}
+
+function renderKpis(){
+  const box=document.getElementById("kpis"); box.innerHTML="";
+  const ents=visibleEntries();
+  if(selected==="ALL"){
+    const devs=uniqueDevices(); const on=devs.filter(isOnline);
+    const off=devs.filter(d=>!isOnline(d));
+    const offNames = off.map(d=>{ const e=deployed().find(x=>x.dev===d); return e? `${hidePII?e.p.id:e.p.name.split(" ")[0]} (${e.room.split(" ")[0]})`:`AQD-${d}`; });
+    add(box,"Devices online",`${on.length}`,`of ${devs.length}`, on.length===devs.length?"var(--ok)":"var(--warn)","signal");
+    add(box,"Participants",`${PARTICIPANTS.length}`,"enrolled",null,"users");
+    add(box,"Needs attention",`${off.length}`, offNames.slice(0,2).join(", ")||"none", off.length?"var(--miss)":"var(--ok)","clock");
+    const pts = Object.values(raw).reduce((s,r)=>s+r.length,0);
+    add(box,"Readings in range",pts.toLocaleString(),
+        customFrom? "custom range" : `last ${rangeH} h`,null,"grid");
+  }else{
+    for(const e of ents){
+      const r=lastReading(e.dev);
+      const on=isOnline(e.dev);
+      add(box, `${e.room} · AQD-${e.dev}`,
+        r&&r.Temperature!=null? r.Temperature.toFixed(1):"—","°C  "+(on?"online":"offline"),
+        on?(e.room==="bedroom"?"var(--bedroom)":"var(--living)"):"var(--miss)",
+        e.room==="bedroom"?"bedroom":"home");
+    }
+    const e0=ents[0]; const r0=e0?lastReading(e0.dev):null;
+    if(r0){
+      add(box,"CO₂ now", r0.SCD40_CO2!=null? Math.round(r0.SCD40_CO2):"—","ppm · "+e0.room,null,"co2");
+      add(box,"Humidity now", r0.Humidity!=null? r0.Humidity.toFixed(1):"—","%RH · "+e0.room,null,"humidity");
+    }
+  }
+  function add(parent,k,v,s,color,ic){
+    const d=document.createElement("div"); d.className="kpi";
+    d.innerHTML=`<div class="k">${ic?icon(ic,14):""}${k}</div><div class="v"${color?` style="color:${color}"`:""}>${v}</div><div class="s">${s||""}</div>`;
+    parent.appendChild(d);
+  }
+}
+
+function renderCharts(){
+  const host=document.getElementById("charts");
+  const ents=visibleEntries();
+  if(!host.dataset.built){
+    host.innerHTML="";
+    for(const m of METRICS){
+      const c=document.createElement("section"); c.className="card";
+      c.innerHTML=`<h2>${icon(METRIC_ICON[m.key]||"grid",17)}${m.label}</h2><div class="sub">${m.sub} · ${m.unit}</div>
+                   <button class="maxbtn" data-max="${m.key}">Maximise</button>
+                   <div class="chartbox"><canvas id="cv_${m.key}"></canvas></div>`;
+      host.appendChild(c);
+    }
+    host.dataset.built="1";
+  }
+  const many = ents.length>6;
+  for(const m of METRICS){
+    const ds = ents.map((e,i)=>{
+      const rows=(raw[e.dev]||[]).filter(r=>r[m.key]!=null);
+      const color = many? css("--ink-3")
+                   : (e.room==="bedroom"? css("--bedroom") : css("--living"));
+      return { label:seriesLabel(e),
+        data: rows.map(r=>({x:r.t*1000, y:r[m.key]})),
+        borderColor: color, backgroundColor: color,
+        borderWidth: many?1.1:2, pointRadius:0, tension:.25,
+        borderDash: (!many && ents.length>2 && i>1)? [4,3] : undefined };
+    });
+    const cv=document.getElementById("cv_"+m.key);
+    if(charts[m.key]) charts[m.key].destroy();
+    charts[m.key]=new Chart(cv,{type:"line",data:{datasets:ds},options:{
+      responsive:true, maintainAspectRatio:false, animation:false,
+      interaction:{mode:"nearest",axis:"x",intersect:false},
+      plugins:{
+        legend:{display:!many, labels:{boxWidth:10,boxHeight:10,usePointStyle:true,
+          color:css("--ink-2"), font:{family:"IBM Plex Sans",size:11}}},
+        tooltip:{callbacks:{
+          title:(it)=>new Date(it[0].parsed.x).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),
+          label:(it)=>`${it.dataset.label}: ${it.parsed.y.toFixed(m.dec)} ${m.unit}`}}
+      },
+      scales:{
+        x:{type:"linear", ticks:{color:css("--ink-3"), font:{family:"IBM Plex Mono",size:10},
+             maxTicksLimit:7, callback:(v)=>fmtClock(v/1000)},
+           grid:{color:css("--line")}},
+        y:{ticks:{color:css("--ink-3"), font:{family:"IBM Plex Mono",size:10},
+             callback:(v)=>v.toFixed(m.dec)},
+           grid:{color:css("--line")}}
+      }
+    }});
+  }
+}
+
+function renderCoverage(){
+  const ents = selected==="ALL" ? deployed() : visibleEntries();
+  const H = winHours();
+  const binMin = H<=6 ? EXPECTED_INTERVAL_MIN : (H<=24 ? 15 : (H<=72 ? 60 : 180));
+  const start = winStart();
+  const nBins = Math.max(1, Math.floor(H*60/binMin));
+  const tbl=document.getElementById("covTable"); tbl.innerHTML="";
+  document.getElementById("covSub").textContent =
+    `${binMin}-minute slots over ${H.toFixed(H<48?0:0)} h — green where the device sent at least one reading`;
+  if(!ents.length){ tbl.innerHTML=`<tr><td class="empty">No devices selected.</td></tr>`; return; }
+
+  for(const e of ents){
+    const rows=raw[e.dev]||[];
+    const first = rows.length? rows[0].t : Infinity;
+    const present=new Array(nBins).fill(false);
+    for(const r of rows){
+      const i=Math.floor((r.t-start)/(binMin*60));
+      if(i>=0&&i<nBins) present[i]=true;
+    }
+    const tr=document.createElement("tr");
+    const th=document.createElement("th"); th.className="rowlab";
+    const pct = Math.round(100*present.filter(Boolean).length/nBins);
+    th.textContent=`${dispName(e.p)} (${e.room}) · ${pct}%`;
+    tr.appendChild(th);
+    for(let i=0;i<nBins;i++){
+      const td=document.createElement("td");
+      const slotStart = start+i*binMin*60;
+      const cls = slotStart<first-binMin*60 ? "" : (present[i]?"on":"off");
+      td.innerHTML=`<span class="cell ${cls}" title="${new Date(slotStart*1000).toLocaleString()} — ${present[i]?"data received":"nothing received"}"></span>`;
+      tr.appendChild(td);
+    }
+    tbl.appendChild(tr);
+  }
+  const trT=document.createElement("tr");
+  trT.appendChild(document.createElement("th"));
+  for(let i=0;i<nBins;i++){
+    const td=document.createElement("td");
+    if(i%Math.ceil(nBins/8)===0){ td.className="covtime"; td.textContent=fmtClock(start+i*binMin*60); }
+    trT.appendChild(td);
+  }
+  tbl.appendChild(trT);
+  const worst = ents.map(e=>{
+    const rows=raw[e.dev]||[]; const exp=Math.max(1,Math.floor(H*60/EXPECTED_INTERVAL_MIN));
+    return {e, pct: Math.round(100*Math.min(rows.length,exp)/exp)};
+  }).sort((a,b)=>a.pct-b.pct)[0];
+  document.getElementById("covNote").textContent = worst
+    ? `Lowest coverage in view: ${dispName(worst.e.p)} (${worst.e.room}) at ${worst.pct}% of the ~${EXPECTED_INTERVAL_MIN}-minute expected rate. Devices upload roughly every ${EXPECTED_INTERVAL_MIN} minutes.`
+    : "";
+}
+
+function renderProfile(){
+  const box=document.getElementById("profile");
+  if(selected==="ALL"){ box.hidden=true; return; }
+  const p=PARTICIPANTS.find(x=>x.id===selected);
+  if(!p||!p.home){ box.hidden=true; return; }
+  const h=p.home, pe=p.person||{};
+  const mate = p.shares ? PARTICIPANTS.find(x=>x.id===p.shares) : null;
+  const cells=[
+    ["Home type",h.type],["Tenure",h.tenure],["Built",h.built],["Floors",h.floors],
+    ["Floor area",h.area||"Not given"],["Rooms",h.rooms],["Occupants",h.people],
+    ["Heating",h.heating],["Thermostat",h.thermostat],["Windows",h.windows],
+    ["Bedroom",h.bedroom],["Bedroom window faces",h.windowFaces],
+    ["Bedroom side of home",h.bedroomSide],["ZIP code",h.zip],
+  ].filter(c=>c[1]);
+  const chips = hidePII ? [] : [
+    pe.gender&&`<span class="chip">${pe.gender}</span>`,
+    pe.age&&`<span class="chip">age <b>${pe.age}</b></span>`,
+    pe.height&&`<span class="chip">${pe.height}</span>`,
+    pe.weight&&`<span class="chip">${pe.weight}</span>`,
+    pe.sensitivity&&`<span class="chip"><b>${pe.sensitivity}</b></span>`,
+    pe.registered&&`<span class="chip">joined ${pe.registered}</span>`,
+    p.status&&`<span class="chip">${p.status}</span>`,
+  ].filter(Boolean);
+  box.innerHTML =
+    `<div class="phead"><span class="avatar">${initials(p)}</span><h2>${dispName(p)}</h2>
+       <span class="em">${p.id}${hidePII?"":" · "+p.email}</span>
+       ${mate?`<span class="em">shares this home with ${dispName(mate)}</span>`:""}</div>
+     ${chips.length?`<div class="person">${chips.join("")}</div>`:""}
+     <div class="hgrid">${cells.map(([k,v])=>
+       `<div class="hcell"><span class="hico">${icon(FIELD_ICON[k]||"grid",17)}</span>
+          <span class="htxt"><span class="hk">${k}</span><span class="hv">${v}</span></span>
+        </div>`).join("")}</div>`;
+  box.hidden=false;
+}
+
+function render(){
+  const ch=document.getElementById("covH2");
+  if(ch && !ch.dataset.ico){ ch.insertAdjacentHTML("afterbegin", icon("grid",17)); ch.dataset.ico="1"; }
+  buildParticipantList(); renderProfile(); renderKpis(); renderCharts(); renderCoverage(); }
+
+/* ---------- maximise ---------- */
+function closeMax(){
+  document.querySelectorAll(".card.max").forEach(c=>{
+    c.classList.remove("max");
+    const b=c.querySelector(".maxbtn"); if(b) b.textContent="Maximise";
+  });
+  document.getElementById("scrim").hidden=true;
+  Object.values(charts).forEach(ch=>ch.resize());
+}
+document.getElementById("charts").addEventListener("click", ev=>{
+  const b=ev.target.closest(".maxbtn"); if(!b) return;
+  const card=b.closest(".card"); const was=card.classList.contains("max");
+  closeMax();
+  if(!was){
+    card.classList.add("max"); b.textContent="Close";
+    document.getElementById("scrim").hidden=false;
+  }
+  setTimeout(()=>Object.values(charts).forEach(ch=>ch.resize()), 30);
+});
+document.getElementById("scrim").onclick=closeMax;
+addEventListener("keydown", e=>{ if(e.key==="Escape") closeMax(); });
+
+/* ---------- controls ---------- */
+document.querySelectorAll("button.seg[data-range]").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("button.seg[data-range]").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true"); rangeH=+b.dataset.range;
+    customFrom=customTo=null;
+    document.getElementById("fromIn").value=""; document.getElementById("toIn").value="";
+    pull();
+  };
+});
+document.getElementById("applyRange").onclick=()=>{
+  const f=document.getElementById("fromIn").value, t=document.getElementById("toIn").value;
+  if(!f || !t){ alert("Pick both a start and an end time, or use one of the preset ranges."); return; }
+  const fs=Math.floor(new Date(f).getTime()/1000), ts=Math.floor(new Date(t).getTime()/1000);
+  if(!(ts>fs)){ alert("The end time must be after the start time."); return; }
+  customFrom=fs; customTo=ts;
+  document.querySelectorAll("button.seg[data-range]").forEach(x=>x.setAttribute("aria-pressed","false"));
+  pull();
+};
+document.getElementById("privacyBtn").onclick=()=>{
+  if(!PRIVATE) return;
+  hidePII=!hidePII; paintIdentity(); render();
+};
+document.getElementById("refreshBtn").onclick=()=>pull();
+document.getElementById("themeBtn").onclick=()=>{
+  const r=document.documentElement;
+  const cur=r.getAttribute("data-theme");
+  const next = cur==="dark" ? "light" : cur==="light" ? "dark"
+    : (matchMedia("(prefers-color-scheme: dark)").matches ? "light":"dark");
+  r.setAttribute("data-theme",next);
+  try{ localStorage.setItem("hc-theme",next); }catch(e){}
+  render();
+};
+try{ const t=localStorage.getItem("hc-theme"); if(t) document.documentElement.setAttribute("data-theme",t); }catch(e){}
+
+/* ---------- public view, with optional sign-in for identities ----------
+   Anyone can read the data: the database allows public reads and blocks writes.
+   Signing in does not unlock more data, only the participant identities. */
+const gate=document.getElementById("gate");
+
+function paintIdentity(){
+  const w=document.getElementById("whoami");
+  const pb=document.getElementById("privacyBtn");
+
+  if(PRIVATE){
+    /* Local monitoring platform. The roster on this machine holds the real
+       names, so no sign-in is needed. The toggle is kept so names can be
+       hidden quickly when the screen is being shared or projected. */
+    w.innerHTML = `<span class="em">private view \u00b7 this computer only</span>`;
+    pb.hidden=false;
+    pb.setAttribute("aria-pressed", String(hidePII));
+    pb.textContent = hidePII ? "Show participant names" : "Hide participant names";
+    return;
+  }
+
+  /* Public portal. The published build contains no names, emails or ZIP
+     codes at all, so there is nothing a sign-in could reveal here. */
+  w.innerHTML = `<span class="em">public view \u00b7 study codes</span>`;
+  pb.hidden=true;
+}
+function closeGate(){ gate.hidden=true;
+  const e=document.getElementById("gErr"); if(e) e.hidden=true; }
+document.getElementById("gClose").onclick=closeGate;
+gate.addEventListener("click", e=>{ if(e.target===gate) closeGate(); });
+addEventListener("keydown", e=>{ if(e.key==="Escape" && !gate.hidden) closeGate(); });
+
+document.getElementById("gateForm").onsubmit = async (ev)=>{
+  ev.preventDefault();
+  const btn=document.getElementById("gGo"), err=document.getElementById("gErr");
+  err.hidden=true; btn.disabled=true; btn.textContent="Signing in...";
+  try{
+    await Auth.signIn(document.getElementById("gEmail").value.trim(),
+                      document.getElementById("gPass").value);
+    signedIn=true; hidePII=false; closeGate(); paintIdentity(); render();
+  }catch(e){ err.textContent=e.message; err.hidden=false; }
+  finally{ btn.disabled=false; btn.textContent="Sign in"; }
+};
+
+(async ()=>{
+  paintIdentity();
+  pull();
+  timer=setInterval(pull, 2*60*1000);   /* refresh every 2 minutes */
+})();
+</script>
+</body>
+</html>
