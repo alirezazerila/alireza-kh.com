@@ -382,7 +382,11 @@ table.cov td{padding:0 1px}
 let rangeH = 6, selected = "ALL", raw = {}, charts = {}, timer = null;
 let customFrom = null, customTo = null;      /* epoch seconds, or null for preset */
 const PRIVATE = (typeof SITE_MODE !== "undefined" && SITE_MODE === "private");
-let hidePII = !PRIVATE;  /* private build shows names; public build has none to show */
+/* Whether identities are shown follows the roster that was actually loaded:
+   the stripped build sets every name to the study code, so there is nothing
+   to reveal, while a full roster is shown as-is. */
+const ROSTER_HAS_NAMES = PARTICIPANTS.some(p => p.name && p.name !== p.id);
+let hidePII = !(PRIVATE || ROSTER_HAS_NAMES);
 let signedIn = false;
 function winStart(){ return customFrom ?? (Math.floor(Date.now()/1000) - rangeH*3600); }
 function winEnd(){   return customTo   ?? Math.floor(Date.now()/1000); }
@@ -740,7 +744,7 @@ document.getElementById("applyRange").onclick=()=>{
   pull();
 };
 document.getElementById("privacyBtn").onclick=()=>{
-  if(!PRIVATE && !signedIn) return;
+  if(!PRIVATE && !signedIn && !ROSTER_HAS_NAMES) return;
   hidePII=!hidePII; paintIdentity(); render();
 };
 document.getElementById("refreshBtn").onclick=()=>pull();
@@ -809,7 +813,12 @@ function paintIdentity(){
 
   /* Public portal. The build ships no identities; the research team can
      sign in to pull them from the database. */
-  if(signedIn){
+  if(ROSTER_HAS_NAMES){
+    w.innerHTML = `<span class="em">team view \u00b7 shared link</span>`;
+    pb.hidden=false;
+    pb.setAttribute("aria-pressed", String(hidePII));
+    pb.textContent = hidePII ? "Show participant names" : "Hide participant names";
+  }else if(signedIn){
     w.innerHTML=`${Auth.email||"signed in"} <button class="signout" id="soBtn">sign out</button>`;
     document.getElementById("soBtn").onclick=()=>{
       Auth.clear(); signedIn=false; hidePII=true; rosterLoaded=false;
@@ -849,7 +858,7 @@ document.getElementById("gateForm").onsubmit = async (ev)=>{
 };
 
 (async ()=>{
-  if(!PRIVATE && Auth.load() && await Auth.token()){
+  if(!PRIVATE && !ROSTER_HAS_NAMES && Auth.load() && await Auth.token()){
     signedIn = true;
     if(await loadRoster()) hidePII = false;
   }
