@@ -6,50 +6,72 @@
 <title>Home Comfort NY — Live Sensors</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  --paper:#faf9f7; --surface:#ffffff; --sunk:#f2f0ec;
-  --line:#e3e0da; --line-strong:#cfcbc3;
-  --ink:#1c222b; --ink-2:#4a5562; --ink-3:#7c8793;
-  --bedroom:#3f5f8f; --living:#c07a3e;
-  --ok:#4f8a5b; --miss:#c24a42; --warn:#cf9233;
-  --shadow:0 1px 2px rgba(28,34,43,.06), 0 4px 14px rgba(28,34,43,.05);
-  --accent-ico:#5a6f8c; --avatar-bg:#e4e9f1; --avatar-fg:#3f5f8f;
+  /* Palette, fonts and particle field are taken from alireza-kh.com so the
+     portal reads as part of that site rather than a separate tool. Cards are
+     translucent for the same reason they are on the site: the drifting node
+     field behind the page stays visible through them. */
+  --display:'Aptos','Aptos Display','Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'Courier New',monospace;
+
+  --paper:#B3EBF2; --surface:rgba(255,255,255,.42); --sunk:rgba(255,255,255,.20);
+  --line:#93D2DC; --line-strong:#7ABECA;
+  --ink:#14181D; --ink-2:#424B55; --ink-3:#4E5863;
+  --accent:#0A6264; --accent-2:#084C4E; --on-accent:#EAFDFE;
+  --bedroom:#0A6264; --living:#A8521C;
+  --ok:#0F7A5A; --miss:#B3332B; --warn:#9A6410;
+  --shadow:0 1px 2px rgba(20,24,29,.05), 0 12px 28px -14px rgba(20,24,29,.18);
+  --accent-ico:#0A6264; --avatar-bg:rgba(10,98,100,.13); --avatar-fg:#084C4E;
+  --particle-alpha:.30; --link-alpha:.13;
+  --card-solid:#CFF3F8; --data-surface:rgba(255,255,255,.80);
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#14181d; --surface:#1a1f26; --sunk:#222932;
-  --line:#2c333d; --line-strong:#3b434e;
-  --ink:#e8eaed; --ink-2:#b2bac4; --ink-3:#8a949f;
-  --bedroom:#7fa3d8; --living:#e0a068;
-  --ok:#6fb87d; --miss:#e0675e; --warn:#e0ae5c;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
-  --accent-ico:#8fa6c4; --avatar-bg:#2b3747; --avatar-fg:#9fc0e0;
+  --paper:#030712; --surface:rgba(255,255,255,.05); --sunk:rgba(255,255,255,.025);
+  --line:rgba(255,255,255,.12); --line-strong:rgba(255,255,255,.20);
+  --ink:#F1F5F9; --ink-2:#A4B1C2; --ink-3:#7F8CA0;
+  --accent:#50EBEC; --accent-2:#2FD9DA; --on-accent:#06242A;
+  --bedroom:#50EBEC; --living:#F0A868;
+  --ok:#35C48E; --miss:#E0675E; --warn:#E0AE5C;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 38px -16px rgba(0,0,0,.7);
+  --accent-ico:#50EBEC; --avatar-bg:rgba(80,235,236,.12); --avatar-fg:#50EBEC;
+  --particle-alpha:.55; --link-alpha:.22;
+  --card-solid:#0C1324; --data-surface:rgba(10,17,32,.88);
 }}
 :root[data-theme="dark"]{
-  --paper:#14181d; --surface:#1a1f26; --sunk:#222932;
-  --line:#2c333d; --line-strong:#3b434e;
-  --ink:#e8eaed; --ink-2:#b2bac4; --ink-3:#8a949f;
-  --bedroom:#7fa3d8; --living:#e0a068;
-  --ok:#6fb87d; --miss:#e0675e; --warn:#e0ae5c;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
-  --accent-ico:#8fa6c4; --avatar-bg:#2b3747; --avatar-fg:#9fc0e0;
+  --paper:#030712; --surface:rgba(255,255,255,.05); --sunk:rgba(255,255,255,.025);
+  --line:rgba(255,255,255,.12); --line-strong:rgba(255,255,255,.20);
+  --ink:#F1F5F9; --ink-2:#A4B1C2; --ink-3:#7F8CA0;
+  --accent:#50EBEC; --accent-2:#2FD9DA; --on-accent:#06242A;
+  --bedroom:#50EBEC; --living:#F0A868;
+  --ok:#35C48E; --miss:#E0675E; --warn:#E0AE5C;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 38px -16px rgba(0,0,0,.7);
+  --accent-ico:#50EBEC; --avatar-bg:rgba(80,235,236,.12); --avatar-fg:#50EBEC;
+  --particle-alpha:.55; --link-alpha:.22;
+  --card-solid:#0C1324; --data-surface:rgba(10,17,32,.88);
 }
 *{box-sizing:border-box}
+/* The node field sits behind everything and never takes pointer events; the
+   window-level listeners in the script below still see the cursor. */
+.particles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap,.gate,.scrim,.card.max{position:relative;z-index:1}
 body{margin:0;background:var(--paper);color:var(--ink);
-  font:400 14px/1.5 "IBM Plex Sans",system-ui,-apple-system,sans-serif;}
+  font:400 14px/1.5 var(--sans);}
 .wrap{max-width:1500px;margin:0 auto;padding-inline:20px;padding-block:0 48px}
 
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  background:color-mix(in srgb, var(--paper) 82%, transparent);backdrop-filter:blur(9px);
   border-bottom:1px solid var(--line);padding-block:14px 12px;margin-bottom:20px}
 .titlerow{display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;justify-content:space-between}
-h1{font:600 25px/1.15 Spectral,Georgia,serif;margin:0;letter-spacing:-.01em}
+h1{font:800 25px/1.15 var(--display);margin:0;letter-spacing:-.022em}
 h1 span{color:var(--ink-3);font-weight:500}
-.meta{font:400 12.5px/1.4 "IBM Plex Mono",ui-monospace,monospace;color:var(--ink-3);
+.meta{font:400 12.5px/1.4 var(--mono);color:var(--ink-3);
   display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px}
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
-button.seg{font:500 12.5px/1 "IBM Plex Sans",sans-serif;padding:7px 11px;border-radius:7px;
+button.seg{font:500 12.5px/1 var(--sans);padding:7px 11px;border-radius:7px;
   border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);cursor:pointer}
 button.seg[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 button.seg:focus-visible{outline:2px solid var(--bedroom);outline-offset:2px}
@@ -60,18 +82,18 @@ button.seg:focus-visible{outline:2px solid var(--bedroom);outline-offset:2px}
 aside{background:var(--surface);border:1px solid var(--line);border-radius:11px;
   box-shadow:var(--shadow);overflow:hidden}
 .aside-h{padding:12px 14px 9px;border-bottom:1px solid var(--line);
-  font:600 11px/1 "IBM Plex Sans";letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+  font:600 11px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
 .plist{list-style:none;margin:0;padding:6px}
 .plist li{margin:0}
 .pbtn{display:block;width:100%;text-align:left;border:0;background:none;cursor:pointer;
-  padding:8px 10px;border-radius:7px;color:var(--ink);font:400 13.5px/1.35 "IBM Plex Sans"}
+  padding:8px 10px;border-radius:7px;color:var(--ink);font:400 13.5px/1.35 var(--sans)}
 .pbtn:hover{background:var(--sunk)}
 .pbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .pbtn[aria-pressed="true"] .pid,.pbtn[aria-pressed="true"] .prooms{color:rgba(255,255,255,.72)}
 .pname{display:block;font-weight:500}
-.pid{font:400 11px/1.3 "IBM Plex Mono";color:var(--ink-3)}
-.prooms{font:400 11px/1.3 "IBM Plex Mono";color:var(--ink-3)}
-.badge{display:inline-block;font:500 9.5px/1 "IBM Plex Sans";letter-spacing:.05em;
+.pid{font:400 11px/1.3 var(--mono);color:var(--ink-3)}
+.prooms{font:400 11px/1.3 var(--mono);color:var(--ink-3)}
+.badge{display:inline-block;font:500 9.5px/1 var(--sans);letter-spacing:.05em;
   text-transform:uppercase;padding:3px 5px;border-radius:4px;margin-left:5px;vertical-align:1px}
 .b-share{background:rgba(63,95,143,.14);color:var(--bedroom)}
 .b-off{background:rgba(194,74,66,.15);color:var(--miss)}
@@ -79,34 +101,34 @@ aside{background:var(--surface);border:1px solid var(--line);border-radius:11px;
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px;margin-bottom:18px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 13px;
   box-shadow:var(--shadow)}
-.kpi .k{font:500 10.5px/1 "IBM Plex Sans";letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
-.kpi .v{font:500 25px/1.1 "IBM Plex Mono";margin-top:7px;font-variant-numeric:tabular-nums}
+.kpi .k{font:500 10.5px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .v{font:500 25px/1.1 var(--mono);margin-top:7px;font-variant-numeric:tabular-nums}
 .kpi .u{font-size:13px;color:var(--ink-3);margin-left:2px}
-.kpi .s{font:400 11.5px/1.3 "IBM Plex Sans";color:var(--ink-3);margin-top:3px}
+.kpi .s{font:400 11.5px/1.3 var(--sans);color:var(--ink-3);margin-top:3px}
 
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;
   box-shadow:var(--shadow);padding:14px 15px 10px}
-.card h2{font:600 14px/1.2 "IBM Plex Sans";margin:0 0 2px}
-.card .sub{font:400 11.5px/1.3 "IBM Plex Mono";color:var(--ink-3);margin-bottom:9px}
+.card h2{font:700 14px/1.2 var(--sans);margin:0 0 2px;letter-spacing:-.01em}
+.card .sub{font:400 11.5px/1.3 var(--mono);color:var(--ink-3);margin-bottom:9px}
 .chartbox{position:relative;height:216px}
 
 .covwrap{margin-top:20px}
 .covscroll{overflow-x:auto}
-table.cov{border-collapse:collapse;font:400 11px/1 "IBM Plex Mono"}
-table.cov th.rowlab{position:sticky;left:0;background:var(--surface);text-align:left;
-  font:400 11.5px/1.25 "IBM Plex Sans";padding:3px 10px 3px 2px;white-space:nowrap;z-index:2;
+table.cov{border-collapse:collapse;font:400 11px/1 var(--mono)}
+table.cov th.rowlab{position:sticky;left:0;background:var(--card-solid);text-align:left;
+  font:400 11.5px/1.25 var(--sans);padding:3px 10px 3px 2px;white-space:nowrap;z-index:2;
   border-right:1px solid var(--line)}
 table.cov td{padding:0 1px}
 .cell{width:9px;height:15px;border-radius:2px;display:block;background:var(--sunk)}
 .cell.on{background:var(--ok)}
 .cell.off{background:var(--miss)}
 .covlegend{display:flex;gap:16px;align-items:center;margin-top:9px;
-  font:400 11.5px/1 "IBM Plex Sans";color:var(--ink-3);flex-wrap:wrap}
+  font:400 11.5px/1 var(--sans);color:var(--ink-3);flex-wrap:wrap}
 .sw{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
-.covtime{font:400 10px/1 "IBM Plex Mono";color:var(--ink-3);padding-top:4px;white-space:nowrap}
+.covtime{font:400 10px/1 var(--mono);color:var(--ink-3);padding-top:4px;white-space:nowrap}
 
-.note{font:400 12px/1.5 "IBM Plex Sans";color:var(--ink-3);margin-top:7px}
+.note{font:400 12px/1.5 var(--sans);color:var(--ink-3);margin-top:7px}
 .gate{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px 20px;
   background:rgba(12,16,20,.55)}
 .gclose{position:absolute;top:18px;right:20px;background:none;border:0;cursor:pointer;
@@ -116,33 +138,33 @@ table.cov td{padding:0 1px}
 #app[hidden]{display:none!important}
 .gatebox{width:100%;max-width:368px;background:var(--surface);border:1px solid var(--line);
   border-radius:13px;box-shadow:var(--shadow);padding:28px 26px 22px;display:flex;flex-direction:column}
-.gtitle{font:600 23px/1.15 Spectral,Georgia,serif;margin:0;color:var(--ink)}
-.gsub{font:400 12.5px/1.4 "IBM Plex Mono";color:var(--ink-3);margin:6px 0 20px}
-.glab{font:500 11px/1 "IBM Plex Sans";letter-spacing:.07em;text-transform:uppercase;
+.gtitle{font:800 23px/1.15 var(--display);margin:0;letter-spacing:-.02em;color:var(--ink)}
+.gsub{font:400 12.5px/1.4 var(--mono);color:var(--ink-3);margin:6px 0 20px}
+.glab{font:500 11px/1 var(--sans);letter-spacing:.07em;text-transform:uppercase;
   color:var(--ink-3);margin-bottom:6px}
-.gin{font:400 14px/1 "IBM Plex Sans";padding:10px 11px;border-radius:8px;margin-bottom:15px;
+.gin{font:400 14px/1 var(--sans);padding:10px 11px;border-radius:8px;margin-bottom:15px;
   border:1px solid var(--line-strong);background:var(--paper);color:var(--ink)}
 .gin:focus{outline:2px solid var(--bedroom);outline-offset:1px;border-color:var(--bedroom)}
-.gbtn{font:600 13.5px/1 "IBM Plex Sans";padding:11px;border-radius:8px;border:0;cursor:pointer;
+.gbtn{font:600 13.5px/1 var(--sans);padding:11px;border-radius:8px;border:0;cursor:pointer;
   background:var(--ink);color:var(--paper);margin-top:4px}
 .gbtn:disabled{opacity:.6;cursor:default}
-.gerr{font:400 12.5px/1.45 "IBM Plex Sans";color:var(--miss);margin:12px 0 0}
+.gerr{font:400 12.5px/1.45 var(--sans);color:var(--miss);margin:12px 0 0}
 .gerr[hidden]{display:none!important}
-.gnote{font:400 11.5px/1.5 "IBM Plex Sans";color:var(--ink-3);margin:16px 0 0;
+.gnote{font:400 11.5px/1.5 var(--sans);color:var(--ink-3);margin:16px 0 0;
   padding-top:14px;border-top:1px solid var(--line)}
-.whoami{font:400 11.5px/1 "IBM Plex Mono";color:var(--ink-3);display:flex;align-items:center;gap:8px}
-.signout{font:500 11.5px/1 "IBM Plex Sans";background:none;border:0;cursor:pointer;
+.whoami{font:400 11.5px/1 var(--mono);color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.signout{font:500 11.5px/1 var(--sans);background:none;border:0;cursor:pointer;
   color:var(--bedroom);text-decoration:underline;padding:0}
 .sep{width:1px;height:20px;background:var(--line-strong);margin:0 3px}
-.rangelab{font:400 11.5px/1 "IBM Plex Sans";color:var(--ink-3);display:flex;align-items:center;gap:5px}
-.rangelab input{font:400 11.5px/1 "IBM Plex Mono";padding:5px 6px;border-radius:6px;
+.rangelab{font:400 11.5px/1 var(--sans);color:var(--ink-3);display:flex;align-items:center;gap:5px}
+.rangelab input{font:400 11.5px/1 var(--mono);padding:5px 6px;border-radius:6px;
   border:1px solid var(--line-strong);background:var(--surface);color:var(--ink)}
 .card{position:relative}
 .maxbtn{position:absolute;top:11px;right:11px;border:1px solid var(--line-strong);
   background:var(--surface);color:var(--ink-3);border-radius:6px;cursor:pointer;
-  font:500 11px/1 "IBM Plex Sans";padding:5px 8px}
+  font:500 11px/1 var(--sans);padding:5px 8px}
 .maxbtn:hover{color:var(--ink);border-color:var(--ink-3)}
-.card.max{position:fixed;inset:14px;z-index:60;margin:0;overflow:auto;
+.card.max{position:fixed;inset:14px;z-index:60;margin:0;overflow:auto;background:var(--card-solid);
   box-shadow:0 18px 60px rgba(0,0,0,.35)}
 .card.max .chartbox{height:calc(100vh - 150px)}
 .scrim{position:fixed;inset:0;background:rgba(10,14,18,.55);z-index:55}
@@ -151,18 +173,18 @@ table.cov td{padding:0 1px}
 .profile[hidden]{display:none!important}
 .phead{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:baseline;
   padding-bottom:11px;margin-bottom:13px;border-bottom:1px solid var(--line)}
-.phead h2{font:600 17px/1.2 "IBM Plex Sans";margin:0}
-.phead .em{font:400 12px/1.3 "IBM Plex Mono";color:var(--ink-3)}
+.phead h2{font:700 17px/1.2 var(--sans);margin:0;letter-spacing:-.015em}
+.phead .em{font:400 12px/1.3 var(--mono);color:var(--ink-3)}
 .person{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.chip{font:400 11.5px/1 "IBM Plex Sans";padding:6px 9px;border-radius:999px;
+.chip{font:400 11.5px/1 var(--sans);padding:6px 9px;border-radius:999px;
   background:var(--sunk);color:var(--ink-2);border:1px solid var(--line)}
 .chip b{font-weight:600;color:var(--ink)}
 .hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
 .hcell{background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
-.hcell .hk{font:500 10px/1 "IBM Plex Sans";letter-spacing:.07em;text-transform:uppercase;
+.hcell .hk{font:500 10px/1 var(--sans);letter-spacing:.07em;text-transform:uppercase;
   color:var(--ink-3);margin-bottom:5px;display:block}
 .hcell .hv{display:block}
-.hcell .hv{font:500 13px/1.35 "IBM Plex Sans";color:var(--ink)}
+.hcell .hv{font:500 13px/1.35 var(--sans);color:var(--ink)}
 .ico{flex:none;vertical-align:-3px}
 .hcell{display:flex;gap:10px;align-items:flex-start}
 .hcell .hico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
@@ -170,7 +192,7 @@ table.cov td{padding:0 1px}
 .hcell .htxt{min-width:0}
 .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;
   background:var(--avatar-bg);color:var(--avatar-fg);
-  font:600 14px/1 "IBM Plex Sans";letter-spacing:.02em}
+  font:600 14px/1 var(--sans);letter-spacing:.02em}
 .phead{align-items:center}
 .card h2{display:flex;align-items:center;gap:8px}
 .card h2 .ico{color:var(--accent-ico)}
@@ -178,14 +200,103 @@ table.cov td{padding:0 1px}
 .kpi .k .ico{color:var(--ink-3)}
 .pbtn{display:flex;gap:9px;align-items:center}
 .pbtn .pav{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;flex:none;
-  background:var(--avatar-bg);color:var(--avatar-fg);font:600 10.5px/1 "IBM Plex Sans"}
+  background:var(--avatar-bg);color:var(--avatar-fg);font:600 10.5px/1 var(--sans)}
 .pbtn[aria-pressed="true"] .pav{background:rgba(255,255,255,.2);color:#fff}
 .pbtn .ptxt{min-width:0;flex:1}
 .empty{padding:34px 16px;text-align:center;color:var(--ink-3);font-size:13px}
+
+/* One colour key for all four charts: the same series index keeps the same
+   colour in every chart, so repeating a 18-line legend four times would just
+   cost plot height. */
+/* Charts, the coverage grid and the KPI row sit on a more opaque surface than
+   the rest: a node drifting across a plotted line costs more than the bit of
+   depth it buys. */
+.grid2 .card,.covwrap,.kpi,.profile{background:var(--data-surface)}
+
+.serieskey{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:14px;padding:11px 13px;
+  background:var(--data-surface);border:1px solid var(--line);border-radius:10px;
+  box-shadow:var(--shadow)}
+.serieskey[hidden]{display:none!important}
+.serieskey .sk{display:flex;align-items:center;gap:6px;
+  font:400 11.5px/1.3 var(--sans);color:var(--ink-2);white-space:nowrap}
+.serieskey .skline{width:16px;height:0;border-top:2.5px solid currentColor;flex:none;border-radius:2px}
+.serieskey .skh{width:100%;font:500 10px/1 var(--sans);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:2px}
 @media (prefers-reduced-motion:no-preference){ .pbtn,button.seg{transition:background .12s,color .12s} }
+
+/* ---------------------------------------------------------------------
+   Mobile. Three things actually break on a phone rather than merely look
+   cramped, and each is handled below: the 258px sidebar leaves no room for
+   a chart, the control bar wraps into a tall stack that pushes the data off
+   screen, and 216px-tall charts holding 18 lines are unreadable.
+   --------------------------------------------------------------------- */
+@media (max-width:760px){
+  .wrap{padding-inline:16px;padding-block:0 32px}
+  header.top{position:static;padding-block:11px 10px;margin-bottom:15px}
+  h1{font-size:20px}
+  h1 span{display:block;font-size:13px;margin-top:2px}
+  .meta{gap:10px;font-size:11.5px}
+
+  /* The participant list becomes a horizontal rail: it keeps one-tap access
+     to every participant without owning half the screen. */
+  .layout{gap:14px}
+  aside{position:sticky;top:0;z-index:15}
+  .aside-h{padding:9px 12px 7px}
+  .plist{display:flex;gap:6px;overflow-x:auto;padding:6px;
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .plist li{flex:none;scroll-snap-align:start}
+  .pbtn{width:auto;padding:7px 11px;white-space:nowrap}
+  .pbtn .prooms{display:none}
+
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:14px}
+  .kpi{padding:10px 11px}
+  .kpi .v{font-size:21px}
+
+  .grid2{grid-template-columns:1fr;gap:12px}
+  .card{padding:12px 12px 8px}
+  .chartbox{height:238px}
+  .card.max{inset:8px}
+  .card.max .chartbox{height:calc(100dvh - 128px)}
+
+  /* 44px tap targets, and the date pickers get a full row each. */
+  .controls{gap:7px}
+  button.seg{padding:10px 12px;font-size:13px}
+  .maxbtn{padding:8px 10px}
+  .rangelab{flex:1 1 100%}
+  .rangelab input{flex:1;min-width:0}
+  .sep{display:none}
+
+  .serieskey{gap:5px 12px;padding:10px 11px;max-height:132px;overflow-y:auto}
+  .hgrid{grid-template-columns:1fr}
+  .phead{gap:8px 14px}
+  .gatebox{padding:24px 20px 20px}
+}
+
+@media (max-width:420px){
+  .wrap{padding-inline:12px}
+  h1{font-size:18px}
+  .kpis{grid-template-columns:1fr}
+  .chartbox{height:210px}
+  .cell{width:7px}
+}
+
+/* A phone in landscape has height to spare but little width: keep the KPI
+   row from eating the fold. */
+@media (max-width:900px) and (orientation:landscape){
+  .chartbox{height:190px}
+  aside{position:static}
+}
+
+/* Coarse pointers get no hover affordances and no cursor-grab field, so the
+   node links would only ever be the ambient ones. Thin them out. */
+@media (hover:none){
+  .maxbtn{opacity:.9}
+}
 </style>
 </head>
 <body>
+<canvas id="particles" class="particles" aria-hidden="true"></canvas>
+
 <div class="gate" id="gate" hidden>
   <button class="gclose" id="gClose" type="button" aria-label="Close">&times;</button>
   <form class="gatebox" id="gateForm">
@@ -241,6 +352,7 @@ table.cov td{padding:0 1px}
   <main>
     <section class="card profile" id="profile" hidden></section>
     <div class="kpis" id="kpis"></div>
+    <div class="serieskey" id="serieskey" hidden></div>
     <div class="grid2" id="charts"></div>
 
     <section class="covwrap card">
@@ -264,6 +376,7 @@ table.cov td{padding:0 1px}
 <script src="auth.js"></script>
 <script src="participants.js"></script>
 <script src="icons.js"></script>
+<script src="particles.js" defer></script>
 <script>
 /* ---------- state ---------- */
 let rangeH = 6, selected = "ALL", raw = {}, charts = {}, timer = null;
@@ -416,6 +529,24 @@ function renderKpis(){
   }
 }
 
+/* Every line in the all-participants view gets its own colour. Hues walk by
+   the golden angle so neighbouring indices land far apart on the wheel, and
+   three alternating saturation/lightness tiers separate hues that would
+   otherwise collide once the list is long. Lighter and more saturated on
+   dark, darker on light, so each line keeps contrast against the page. */
+function isDarkTheme(){
+  const t = document.documentElement.getAttribute("data-theme");
+  if(t) return t === "dark";
+  return matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function seriesColor(i){
+  const d = isDarkTheme(), tier = i % 3;
+  const h = (i * 137.508) % 360;
+  const sat = (d ? [72,60,84] : [64,54,76])[tier];
+  const lit = (d ? [64,74,56] : [40,32,48])[tier];
+  return `hsl(${h.toFixed(1)}deg ${sat}% ${lit}%)`;
+}
+
 function renderCharts(){
   const host=document.getElementById("charts");
   const ents=visibleEntries();
@@ -431,15 +562,26 @@ function renderCharts(){
     host.dataset.built="1";
   }
   const many = ents.length>6;
+
+  const key=document.getElementById("serieskey");
+  if(many){
+    key.innerHTML='<span class="skh">Series</span>' + ents.map((e,i)=>
+      `<span class="sk"><span class="skline" style="color:${seriesColor(i)}"></span>${seriesLabel(e)}</span>`
+    ).join("");
+    key.hidden=false;
+  }else{
+    key.hidden=true; key.innerHTML="";
+  }
+
   for(const m of METRICS){
     const ds = ents.map((e,i)=>{
       const rows=(raw[e.dev]||[]).filter(r=>r[m.key]!=null);
-      const color = many? css("--ink-3")
+      const color = many ? seriesColor(i)
                    : (e.room==="bedroom"? css("--bedroom") : css("--living"));
       return { label:seriesLabel(e),
         data: rows.map(r=>({x:r.t*1000, y:r[m.key]})),
         borderColor: color, backgroundColor: color,
-        borderWidth: many?1.1:2, pointRadius:0, tension:.25,
+        borderWidth: many?1.5:2, pointRadius:0, tension:.25,
         borderDash: (!many && ents.length>2 && i>1)? [4,3] : undefined };
     });
     const cv=document.getElementById("cv_"+m.key);
@@ -449,7 +591,7 @@ function renderCharts(){
       interaction:{mode:"nearest",axis:"x",intersect:false},
       plugins:{
         legend:{display:!many, labels:{boxWidth:10,boxHeight:10,usePointStyle:true,
-          color:css("--ink-2"), font:{family:"IBM Plex Sans",size:11}}},
+          color:css("--ink-2"), font:{family:"Inter",size:11}}},
         tooltip:{callbacks:{
           title:(it)=>new Date(it[0].parsed.x).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}),
           label:(it)=>`${it.dataset.label}: ${it.parsed.y.toFixed(m.dec)} ${m.unit}`}}
@@ -598,7 +740,7 @@ document.getElementById("applyRange").onclick=()=>{
   pull();
 };
 document.getElementById("privacyBtn").onclick=()=>{
-  if(!PRIVATE) return;
+  if(!PRIVATE && !signedIn) return;
   hidePII=!hidePII; paintIdentity(); render();
 };
 document.getElementById("refreshBtn").onclick=()=>pull();
@@ -610,6 +752,7 @@ document.getElementById("themeBtn").onclick=()=>{
   r.setAttribute("data-theme",next);
   try{ localStorage.setItem("hc-theme",next); }catch(e){}
   render();
+  if(window.__particlesRetheme) setTimeout(window.__particlesRetheme, 50);
 };
 try{ const t=localStorage.getItem("hc-theme"); if(t) document.documentElement.setAttribute("data-theme",t); }catch(e){}
 
@@ -617,6 +760,37 @@ try{ const t=localStorage.getItem("hc-theme"); if(t) document.documentElement.se
    Anyone can read the data: the database allows public reads and blocks writes.
    Signing in does not unlock more data, only the participant identities. */
 const gate=document.getElementById("gate");
+
+/* ---------- identities behind sign-in ----------
+   The published build contains no names: stripping them out of the file is
+   the only thing that actually protects them on static hosting, because a
+   static host serves whatever it is given. The names live in the database
+   instead, under /roster, readable only with a token. Signing in fetches
+   them and merges them into the roster already in memory. */
+const ROSTER_URL = FIREBASE.replace(/\/ESF-Sensors$/, "") + "/roster.json";
+let rosterLoaded = false;
+
+async function loadRoster(){
+  if(rosterLoaded) return true;
+  const tok = await Auth.token();
+  if(!tok) return false;
+  try{
+    const r = await fetch(`${ROSTER_URL}?auth=${encodeURIComponent(tok)}`);
+    if(!r.ok) return false;
+    const j = await r.json();
+    if(!j) return false;
+    for(const p of PARTICIPANTS){
+      const e = j[p.id];
+      if(!e) continue;
+      if(e.name)  p.name  = e.name;
+      if(e.email) p.email = e.email;
+      if(e.person) p.person = e.person;
+      if(e.zip && p.home) p.home.zip = e.zip;
+    }
+    rosterLoaded = true;
+    return true;
+  }catch(err){ return false; }
+}
 
 function paintIdentity(){
   const w=document.getElementById("whoami");
@@ -633,10 +807,23 @@ function paintIdentity(){
     return;
   }
 
-  /* Public portal. The published build contains no names, emails or ZIP
-     codes at all, so there is nothing a sign-in could reveal here. */
-  w.innerHTML = `<span class="em">public view \u00b7 study codes</span>`;
-  pb.hidden=true;
+  /* Public portal. The build ships no identities; the research team can
+     sign in to pull them from the database. */
+  if(signedIn){
+    w.innerHTML=`${Auth.email||"signed in"} <button class="signout" id="soBtn">sign out</button>`;
+    document.getElementById("soBtn").onclick=()=>{
+      Auth.clear(); signedIn=false; hidePII=true; rosterLoaded=false;
+      paintIdentity(); render();
+    };
+    pb.hidden=false;
+    pb.setAttribute("aria-pressed", String(hidePII));
+    pb.textContent = hidePII ? "Show participant names" : "Hide participant names";
+  }else{
+    w.innerHTML=`<span class="em">public view \u00b7 study codes</span>
+                 <button class="signout" id="siBtn">sign in</button>`;
+    document.getElementById("siBtn").onclick=()=>{ gate.hidden=false; };
+    pb.hidden=true;
+  }
 }
 function closeGate(){ gate.hidden=true;
   const e=document.getElementById("gErr"); if(e) e.hidden=true; }
@@ -651,12 +838,21 @@ document.getElementById("gateForm").onsubmit = async (ev)=>{
   try{
     await Auth.signIn(document.getElementById("gEmail").value.trim(),
                       document.getElementById("gPass").value);
-    signedIn=true; hidePII=false; closeGate(); paintIdentity(); render();
+    signedIn=true;
+    const got = await loadRoster();
+    hidePII = !got;                /* no roster means there is nothing to show */
+    closeGate(); paintIdentity(); render();
+    if(!got) alert("Signed in, but the name list could not be read. "
+                 + "Check that /roster exists and its rule allows authenticated reads.");
   }catch(e){ err.textContent=e.message; err.hidden=false; }
   finally{ btn.disabled=false; btn.textContent="Sign in"; }
 };
 
 (async ()=>{
+  if(!PRIVATE && Auth.load() && await Auth.token()){
+    signedIn = true;
+    if(await loadRoster()) hidePII = false;
+  }
   paintIdentity();
   pull();
   timer=setInterval(pull, 2*60*1000);   /* refresh every 2 minutes */
